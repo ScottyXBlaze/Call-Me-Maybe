@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 14:08:13 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/03 14:54:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/03 15:55:51 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,8 +14,8 @@ from typing import Any, Generator
 
 from llm_sdk import Small_LLM_Model
 
-from .parser import Parser
 from .model import FunctionDefinition
+from .parser import Parser
 
 
 class My_LLM:
@@ -24,9 +24,13 @@ class My_LLM:
         self.parser = Parser()
 
         self.prompts = self.parser.load_prompts()
-        self.func_defs: list[FunctionDefinition] = self.parser.load_function_definitions()
+        self.func_defs: list[FunctionDefinition] = (
+            self.parser.load_function_definitions()
+        )
 
-        self.func_desc: list[tuple[str, str]] = [(a.name, a.description) for a in self.func_defs]
+        self.func_desc: list[tuple[str, str]] = [
+            (a.name, a.description) for a in self.func_defs
+        ]
         print(self.func_desc)
 
     def get_func_name(self, prompt: str, func_name_token: list[Any]) -> None:
@@ -35,28 +39,33 @@ class My_LLM:
 
         {str(self.func_desc)}
 
-        Which function name to use for the following prompt:
-
+        Which function name of the above is valid for the following prompts:
         Example:
-        P: What is the sum of 2 and 3
-        A: add_numbers
+        the prompt is: What is the sum of 9 and 1?
+        The function name: fn_add_numbers
 
-        P: {prompt}
-        A: 
-        """
+        The prompt is: {prompt}
+        The function name: """
         func_name = []
-        next_token = self.get_next_tokens(new_prompt)
         i = 0
-        print(f"THE PROMPT IS: {prompt}")
-        for token in next_token:
-            if token in [a[0][i] for a in func_name_token]:
-                print(f"Token {token} added")
-                func_name.append(token)
-                print(self.model.decode(func_name))
+        func_name_token = [func[0] for func in func_name_token]
+        while True:
+            next_token = self.get_next_tokens(new_prompt)
+            probability = [a[i] for a in func_name_token if len(a) > i]
+            for token in next_token:
+                try:
+                    if token in probability:
+                        func_name.append(token)
+                        new_prompt += self.model.decode([token])
+                        i += 1
+                        break
+                except IndexError:
+                    pass
+            if func_name in func_name_token:
                 break
+        print(f"{new_prompt}")
 
-    def get_func_args(self) -> None:
-        ...
+    def get_func_args(self) -> None: ...
 
     def get_tokens(self, func_names: list[str]) -> list[Any]:
         result = []
