@@ -5,10 +5,11 @@
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/03 14:08:13 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/04 20:11:40 by nyramana        ###   ########.fr        #
+#    Created: 2026/08/04 22:58:41 by nyramana         #+#    #+#              #
+#    Updated: 2026/08/04 23:37:44 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
+
 
 import json
 from typing import Any, Generator
@@ -23,7 +24,7 @@ class My_LLM:
     """
     Simple class that generates the function call by using the Small_LLM_Model.
 
-    It use the concept of constrained decoding.
+    It uses the concept of constrained decoding.
     """
 
     def __init__(self) -> None:
@@ -97,21 +98,6 @@ Function: """
         decoded_name = self.model.decode(func_name).strip()
         return {"name": decoded_name}
 
-    def get_func_args(self, prompt: str, func_name: str) -> dict[str, Any]:
-        """
-        Get the function arguments.
-
-        Args:
-            prompt (str): The initial prompt/question.
-            func_name (str): The name of the function.
-        Returns:
-            dict: The key, value of the parameters.
-        """
-        func_signature = self.get_func_signature(func_name)
-        return func_signature
-
-    def get_func_arg(self, prompt: str) -> None: ...
-
     def get_tokens(self, func_names: list[str]) -> list[list[int]]:
         """
         Get the token version of the name of the function.
@@ -177,7 +163,7 @@ Function: """
 
     def get_func_signature(self, func_name: str) -> dict[str, Any]:
         """
-        Get the function signature.
+        Get the function signature as a JSON-serializable dictionary.
 
         Args:
             func_name (str): The name of the function.
@@ -186,7 +172,11 @@ Function: """
         """
         for func in self.func_defs:
             if func.name == func_name:
-                return func.parameters
+                value = {
+                    k: "".join(v.model_dump().values())
+                    for k, v in func.parameters.items()
+                }
+                return value
         return {}
 
     def run(self) -> None:
@@ -198,7 +188,9 @@ Function: """
             result = {"prompt": prompt}
             func_name = self.get_func_name(prompt, func_token)
             result.update(func_name)
+            # result.update(self.get_func_args(prompt, func_name["name"]))
             total.append(result)
             print(result)
+
         obj = json.dumps(total, indent=4)
         print(obj)
