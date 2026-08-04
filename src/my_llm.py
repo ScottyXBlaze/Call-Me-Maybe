@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 14:08:13 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/03 15:55:51 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/04 16:14:10 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -28,44 +28,47 @@ class My_LLM:
             self.parser.load_function_definitions()
         )
 
-        self.func_desc: list[tuple[str, str]] = [
-            (a.name, a.description) for a in self.func_defs
-        ]
-        print(self.func_desc)
+        self.func_desc = "\n".join(
+            [f"{a.name}: {a.description}" for a in self.func_defs]
+        )
 
-    def get_func_name(self, prompt: str, func_name_token: list[Any]) -> None:
-        new_prompt = f"""
-        Here is a list of function and it's definition:
+    def get_func_name(
+        self, prompt: str, func_name_token: list[Any]
+    ) -> dict[str, str]:
+        new_prompt = f"""Choose the exact function name from the list that best answers the prompt.
 
-        {str(self.func_desc)}
+### Example 1
+Functions:
+calculate_sum: Adds two numbers
+convert_to_upper: Converts text to uppercase
 
-        Which function name of the above is valid for the following prompts:
-        Example:
-        the prompt is: What is the sum of 9 and 1?
-        The function name: fn_add_numbers
+User prompt: What is 15 plus 10?
+Function: calculate_sum
 
-        The prompt is: {prompt}
-        The function name: """
+### Real Task
+Functions:
+{self.func_desc}
+
+User prompt: {prompt}
+Function:"""
         func_name = []
         i = 0
         func_name_token = [func[0] for func in func_name_token]
         while True:
-            next_token = self.get_next_tokens(new_prompt)
-            probability = [a[i] for a in func_name_token if len(a) > i]
-            for token in next_token:
-                try:
-                    if token in probability:
-                        func_name.append(token)
-                        new_prompt += self.model.decode([token])
-                        i += 1
-                        break
-                except IndexError:
-                    pass
+            prob = [a[i] for a in func_name_token if len(a) > i]
+            for token in self.get_next_tokens(new_prompt):
+                if token in prob:
+                    func_name.append(token)
+                    new_prompt += self.model.decode([token])
+                    i += 1
+                    break
             if func_name in func_name_token:
                 break
-        print(f"{new_prompt}")
+        return {"name": self.model.decode(func_name)}
 
-    def get_func_args(self) -> None: ...
+    def get_func_args(self, prompt: str, func_name: str) -> dict[str, Any]:
+        func_signature = self.get_func_signature(func_name)
+        return func_signature
 
     def get_tokens(self, func_names: list[str]) -> list[Any]:
         result = []
@@ -91,8 +94,18 @@ class My_LLM:
             yield max_index
             logits[max_index] = float("-inf")
 
+    def get_func_signature(self, func_name: str) -> dict[str, Any]:
+        for func in self.func_defs:
+            if func.name == func_name:
+                return func.parameters
+        return {}
+
     def run(self) -> None:
         self.parser.check_args()
         func_token = self.get_tokens([a.name for a in self.func_defs])
         for prompt in self.prompts:
-            self.get_func_name(prompt, func_token)
+            result = {"prompt": prompt}
+            func_name = self.get_func_name(prompt, func_token)
+            result.update(func_name)
+            result.update(self.get_func_args(prompt, func_name["name"]))
+            print(result)
