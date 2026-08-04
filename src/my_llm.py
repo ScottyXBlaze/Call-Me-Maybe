@@ -6,10 +6,11 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 14:08:13 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/04 16:14:10 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/04 16:30:04 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
+import json
 from typing import Any, Generator
 
 from llm_sdk import Small_LLM_Model
@@ -70,6 +71,8 @@ Function:"""
         func_signature = self.get_func_signature(func_name)
         return func_signature
 
+    def get_func_arg(self, prompt: str) -> None: ...
+
     def get_tokens(self, func_names: list[str]) -> list[Any]:
         result = []
         for name in func_names:
@@ -107,5 +110,5 @@ Function:"""
             result = {"prompt": prompt}
             func_name = self.get_func_name(prompt, func_token)
             result.update(func_name)
-            result.update(self.get_func_args(prompt, func_name["name"]))
-            print(result)
+            obj = json.dumps(result, indent=4)
+            print(obj)

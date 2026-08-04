@@ -14,6 +14,7 @@ from .parser import Parser
 
 from .my_llm import My_LLM
 
+
 class Main:
     def __init__(self) -> None:
         self.parser = Parser()
