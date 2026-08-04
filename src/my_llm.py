@@ -6,18 +6,23 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/04 22:58:41 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/04 23:37:44 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/05 00:53:22 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
-
 import json
+import logging
 from typing import Any, Generator
 
 from llm_sdk import Small_LLM_Model
 
-from .model import FunctionDefinition
+from .model import FunctionCallResult, FunctionDefinition
 from .parser import Parser
+
+logger = logging.getLogger(__name__)
+
+# Ensemble des tokens qui doivent stopper la génération d'une valeur string.
+_STRING_STOP_CHARS = ('"', "\n")
 
 
 class My_LLM:
@@ -173,11 +178,233 @@ Function: """
         for func in self.func_defs:
             if func.name == func_name:
                 value = {
-                    k: "".join(v.model_dump().values())
+                    k: "".join(str(x) for x in v.model_dump().values() if x)
                     for k, v in func.parameters.items()
                 }
                 return value
         return {}
+
+    @staticmethod
+    def _classify_type(p_type: str) -> str:
+        """
+        Classify a raw type string into 'number', 'boolean' or 'string'.
+
+        Args:
+            p_type (str): The raw type description from the function signature.
+        Returns:
+            str: One of 'number', 'boolean', 'string'.
+        """
+        p_type_lower = p_type.lower()
+        if "bool" in p_type_lower:
+            return "boolean"
+        if (
+            "num" in p_type_lower
+            or "int" in p_type_lower
+            or "float" in p_type_lower
+        ):
+            return "number"
+        return "string"
+
+    def _get_number_value(self, input_ids: list[int]) -> float | int:
+        """Constrained decoding for a numeric argument."""
+        val_str = ""
+        for _ in range(12):
+            logits = self.model.get_logits_from_input_ids(input_ids)
+            sorted_tokens = sorted(
+                range(len(logits)), key=lambda k: logits[k], reverse=True
+            )
+
+            best_token = None
+            for token_id in sorted_tokens[:150]:
+                decoded = self.model.decode([token_id])
+                if decoded and (
+                    all(c in "0123456789.-" for c in decoded)
+                    or decoded in [",", "\n", " ", "}", '"']
+                ):
+                    best_token = token_id
+                    break
+
+            if best_token is None:
+                break
+
+            decoded_str = self.model.decode([best_token])
+            if decoded_str in [",", "\n", " ", "}", '"']:
+                break
+
+            val_str += decoded_str
+            input_ids.append(best_token)
+
+        clean_val = val_str.strip()
+        if not clean_val:
+            logger.warning(
+                "Numeric extraction returned an empty value; "
+                "defaulting to 0 and flagging for review."
+            )
+            return 0
+
+        try:
+            return float(clean_val) if "." in clean_val else int(clean_val)
+        except ValueError:
+            logger.warning(
+                "Could not parse %r as a number; defaulting to 0.", clean_val
+            )
+            return 0
+
+    def _get_boolean_value(self, input_ids: list[int]) -> bool:
+        """
+        Constrained decoding for a boolean argument.
+
+        Only allows tokens that are a strict prefix of 'true' or 'false',
+        exactly like the function-name selection does.
+        """
+        candidates = ["true", "false"]
+        chosen = ""
+
+        while True:
+            remaining = [c for c in candidates if c.startswith(chosen)]
+            if len(remaining) <= 1 or chosen in candidates:
+                break
+
+            logits = self.model.get_logits_from_input_ids(input_ids)
+            sorted_tokens = sorted(
+                range(len(logits)), key=lambda k: logits[k], reverse=True
+            )
+
+            best_token = None
+            for token_id in sorted_tokens[:150]:
+                decoded = self.model.decode([token_id]).lower()
+                if decoded and any(
+                    c.startswith(chosen + decoded) for c in remaining
+                ):
+                    best_token = token_id
+                    break
+
+            if best_token is None:
+                break
+
+            decoded_str = self.model.decode([best_token]).lower()
+            chosen += decoded_str
+            input_ids.append(best_token)
+
+        if chosen not in candidates:
+            logger.warning(
+                "Boolean extraction produced %r, defaulting to False.", chosen
+            )
+            return False
+
+        return chosen == "true"
+
+    def _get_string_value(self, input_ids: list[int]) -> str:
+        """
+        Constrained decoding for a string argument.
+
+        Stops as soon as a token contains a closing quote or newline,
+        instead of running unconstrained until an arbitrary token limit.
+        """
+        val_str = ""
+        for _ in range(40):
+            logits = self.model.get_logits_from_input_ids(input_ids)
+            sorted_tokens = sorted(
+                range(len(logits)), key=lambda k: logits[k], reverse=True
+            )
+
+            best_token = None
+            decoded = ""
+            for token_id in sorted_tokens[:150]:
+                decoded = self.model.decode([token_id])
+                if decoded:
+                    best_token = token_id
+                    break
+
+            if best_token is None:
+                break
+
+            if any(stop in decoded for stop in _STRING_STOP_CHARS):
+                clean_part = decoded
+                for stop in _STRING_STOP_CHARS:
+                    clean_part = clean_part.split(stop)[0]
+                val_str += clean_part
+                break
+
+            val_str += decoded
+            input_ids.append(best_token)
+
+        return val_str.strip()
+
+    def get_single_arg_value(
+        self, prompt_with_prefix: str, param_name: str, p_type: str
+    ) -> Any:
+        """
+        Génère la valeur d'un paramètre via Constrained Decoding strict.
+
+        Args:
+            prompt_with_prefix (str): Le prompt déjà préfixé avec le début
+                du buffer JSON (clé + éventuel guillemet ouvrant).
+            param_name (str): Le nom du paramètre (pour le logging).
+            p_type (str): Le type déclaré du paramètre.
+        Returns:
+            Any: La valeur extraite, typée selon p_type.
+        """
+        input_ids = self.model.encode(prompt_with_prefix).tolist()[0]
+        kind = self._classify_type(p_type)
+
+        if kind == "number":
+            return self._get_number_value(input_ids)
+        if kind == "boolean":
+            return self._get_boolean_value(input_ids)
+        return self._get_string_value(input_ids)
+
+    def get_func_args(self, prompt: str, func_name: str) -> dict[str, Any]:
+        """Extrait automatiquement tous les arguments requis par la signature de la fonction."""
+        signature = self.get_func_signature(func_name)
+        if not signature:
+            return {"parameters": {}}
+
+        base_prompt = f"""Task: Extract argument values directly from the request.
+Rules:
+1. Do not calculate, solve or compute math.
+2. Copy exact words or values.
+3. When a parameters is finished, put a new line '\n'.
+
+Request: "{prompt}"
+Function: {func_name}
+
+JSON Output:
+"""
+        json_buffer = "{\n"
+        extracted_args = {}
+
+        params_items = list(signature.items())
+        for idx, (param_name, param_info) in enumerate(params_items):
+            p_type = str(param_info)
+            kind = self._classify_type(p_type)
+
+            # Insérer la clé automatiquement dans la structure JSON.
+            # Les strings ont un guillemet ouvrant, pas les nombres/booléens.
+            if kind == "string":
+                prefix = f'  "{param_name}": "'
+            else:
+                prefix = f'  "{param_name}": '
+
+            json_buffer += prefix
+            current_prompt = base_prompt + json_buffer
+
+            val = self.get_single_arg_value(current_prompt, param_name, p_type)
+            extracted_args[param_name] = val
+
+            if kind == "string":
+                json_buffer += f'{val}"'
+            elif kind == "boolean":
+                json_buffer += "true" if val else "false"
+            else:
+                json_buffer += str(val)
+
+            if idx < len(params_items) - 1:
+                json_buffer += ",\n"
+            else:
+                json_buffer += "\n"
+
+        return {"parameters": extracted_args}
 
     def run(self) -> None:
         """Run the generation of the function call."""
@@ -188,9 +415,12 @@ Function: """
             result = {"prompt": prompt}
             func_name = self.get_func_name(prompt, func_token)
             result.update(func_name)
-            # result.update(self.get_func_args(prompt, func_name["name"]))
+            result.update(self.get_func_args(prompt, func_name["name"]))
             total.append(result)
             print(result)
 
         obj = json.dumps(total, indent=4)
         print(obj)
+        self.parser.save_function_calls(
+            [FunctionCallResult.model_validate(single) for single in total]
+        )
