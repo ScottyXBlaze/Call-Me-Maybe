@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 14:08:13 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/04 19:57:35 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/04 20:11:40 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -53,7 +53,8 @@ class My_LLM:
         Returns:
             dict: The key, value of the function name.
         """
-        new_prompt = f"""Choose the exact function name from the list that best answers the prompt.
+        new_prompt = f"""
+Choose the exact function name from the list that best answers the prompt.
 
 ### Example 1
 Functions:
@@ -149,7 +150,9 @@ Function: """
             yield max_index
             logits[max_index] = float("-inf")
 
-    def get_best_allowed_token( self, prompt: str, allowed_tokens: set[int]) -> int:
+    def get_best_allowed_token(
+        self, prompt: str, allowed_tokens: set[int]
+    ) -> int:
         """
         Get the best allowed tokens.
 
