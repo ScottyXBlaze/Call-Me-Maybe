@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 14:57:34 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:00:15 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -31,6 +31,14 @@ class Checker:
         }
 
     def check_args(self, args: list[str]) -> dict[str, str]:
+        """
+        Check and validate arguments for the input, output, and funcdef.
+
+        Args:
+            args (list[str]): Every argument to test and validate.
+        Returns:
+            dict: dictionnary that contains every arguments.
+        """
         i = 0
         while i < len(args):
             flag = args[i]
