@@ -6,15 +6,20 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/21 16:44:05 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/03 13:45:52 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:25:15 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """Module that contains every utility models."""
 
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, Field
+
+
+class Prompt(BaseModel):
+    """Class that contains the prompt."""
+    prompt: str = Field()
 
 
 class ParameterInfo(BaseModel):
@@ -28,8 +33,8 @@ class FunctionDefinition(BaseModel):
 
     name: str = Field()
     description: str = Field()
-    parameters: Dict[str, ParameterInfo] = Field()
-    returns: Dict[str, str] = Field()
+    parameters: dict[str, ParameterInfo] = Field()
+    returns: dict[str, str] = Field()
 
 
 class FunctionCallResult(BaseModel):
@@ -37,4 +42,4 @@ class FunctionCallResult(BaseModel):
 
     prompt: str = Field()
     name: str = Field()
-    parameters: Dict[str, Any] = Field()
+    parameters: dict[str, Any] = Field()
