@@ -1,19 +1,23 @@
 # *************************************************************************** #
 #                                                                             #
 #                                                        :::      ::::::::    #
-#    __init__.py                                       :+:      :+:    :+:    #
+#    llm.py                                            :+:      :+:    :+:    #
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/10 12:45:12 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:47:18 by nyramana        ###   ########.fr        #
+#    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
+#    Updated: 2026/08/10 16:46:47 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
-"""Package that contains the basic parser of the program."""
 
-from .checker import Checker
-from .loader import Loader
-from .saver import Saver
+class MyLLM:
+    def __init__(self) -> None: ...
 
-__all__ = ["Checker", "Loader", "Saver"]
+    def generate_func_name(self) -> None: ...
+
+    def generate_func_args(self) -> None: ...
+
+    def generate_func_arg(self) -> None: ...
+
+    def run(self) -> None: ...

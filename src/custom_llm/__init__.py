@@ -5,15 +5,11 @@
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/10 12:45:12 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:47:18 by nyramana        ###   ########.fr        #
+#    Created: 2026/08/10 16:44:32 by nyramana         #+#    #+#              #
+#    Updated: 2026/08/10 16:44:34 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
-"""Package that contains the basic parser of the program."""
+from .llm import MyLLM
 
-from .checker import Checker
-from .loader import Loader
-from .saver import Saver
-
-__all__ = ["Checker", "Loader", "Saver"]
+__all__ = ["MyLLM"]

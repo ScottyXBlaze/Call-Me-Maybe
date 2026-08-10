@@ -1,19 +1,21 @@
 # *************************************************************************** #
 #                                                                             #
 #                                                        :::      ::::::::    #
-#    __init__.py                                       :+:      :+:    :+:    #
+#    tokenizer.py                                      :+:      :+:    :+:    #
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/10 12:45:12 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:47:18 by nyramana        ###   ########.fr        #
+#    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
+#    Updated: 2026/08/10 15:56:35 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
-"""Package that contains the basic parser of the program."""
 
-from .checker import Checker
-from .loader import Loader
-from .saver import Saver
+class Tokenizer:
+    def __init__(self) -> None: ...
 
-__all__ = ["Checker", "Loader", "Saver"]
+    def get_tokens(self, string: list[str]) -> list[list[int]]: ...
+
+    def get_token(self, string: str) -> list[int]: ...
+
+    def get_best_token(self, string: str, allowed_tokens: set[int]) -> int: ...
