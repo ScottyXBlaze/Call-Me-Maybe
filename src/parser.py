@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/21 16:43:42 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/03 13:45:11 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/05 10:02:37 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -179,6 +179,7 @@ class Parser:
         filepath = self.args["--output"]
         try:
             serialized_results = [result.model_dump() for result in results]
+            os.makedirs(os.path.join(*filepath.split("/")[:-1]))
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(serialized_results, f, indent=2, ensure_ascii=False)
             print(f"Success: {len(results)} saved in {filepath}")
