@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 14:40:40 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 14:57:34 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -16,36 +16,32 @@ import os
 import sys
 
 
+class ArgumentError(Exception):
+    ...
+
 class Checker:
     """Class That checks if the parameter is Valid or not."""
 
     def __init__(self) -> None:
         """Everything starts here."""
-        self.args = {}
+        self.arguments = {
+            "--functions_definition": "data/input/functions_definition.json",
+            "--input": "data/input/function_calling_tests.json",
+            "--output": "data/output/function_calls.json",
+        }
 
-    def check_args(self, args: list[str]) -> None:
-        """Check the arguments and validate them."""
+    def check_args(self, args: list[str]) -> dict[str, str]:
         i = 0
         while i < len(args):
             flag = args[i]
-            if flag not in self.args:
-                print(f"Error: Unknown parameter '{flag}'", file=sys.stderr)
-                sys.exit(1)
-
-            if i + 1 >= len(args):
-                print(
-                    f"Error: Missing value for parameter '{flag}'",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
-
-            self.validate_params(flag, sys.argv[i + 1])
-            self.args[flag] = sys.argv[i + 1]
+            if flag not in self.arguments:
+                raise ArgumentError(f"Parameter {flag} is invalid.")
+            elif i + 1 >= len(args):
+                raise ArgumentError(f"Missing value for parameter {flag}")
+            self.validate_params(flag, args[i + 1])
+            self.arguments[flag] = sys.argv[i + 1]
             i += 2
-
-    def check_args2(self, args: list[str]) -> dict[str, str]:
-        result: dict[str, str] = {}
-        return result
+        return self.arguments
 
     def validate_params(self, params: str, path: str) -> None:
         """
@@ -72,12 +68,9 @@ class Checker:
                 os.makedirs(dirname, exist_ok=True)
                 with open(path, "w") as _:
                     pass
-            except Exception as e:
-                print(
-                    f"Error: Cannot create output directory '{dirname}': {e}",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
+            except (PermissionError, IsADirectoryError, OSError) as e:
+                raise ArgumentError(f"Invalid input argument {e}")
+
 
     def verify_input(self, path: str) -> None:
         """
@@ -89,6 +82,5 @@ class Checker:
         try:
             with open(path, "r"):
                 pass
-        except Exception as e:
-            print(f"Error: Cannot read file '{path}': {e}", file=sys.stderr)
-            sys.exit(1)
+        except (PermissionError, IsADirectoryError, OSError) as e:
+            raise ArgumentError(f"Invalid input argument {e}")

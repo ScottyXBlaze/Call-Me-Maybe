@@ -6,11 +6,10 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 12:45:12 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 12:45:23 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 14:41:43 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 from .checker import Checker
-
 
 __all__ = ["Checker"]
