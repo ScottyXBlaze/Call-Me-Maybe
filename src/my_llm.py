@@ -6,13 +6,16 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/04 22:58:41 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/05 00:53:22 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:41:16 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
+"""Module that contains de base LLm of the program."""
+
 import json
 import logging
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 from llm_sdk import Small_LLM_Model
 
@@ -355,12 +358,22 @@ Function: """
         return self._get_string_value(input_ids)
 
     def get_func_args(self, prompt: str, func_name: str) -> dict[str, Any]:
-        """Extrait automatiquement tous les arguments requis par la signature de la fonction."""
+        """
+        Get function.
+
+        Args:
+            self (Any): Description of self.
+            prompt (str): Description of prompt.
+            func_name (str): Description of func_name.
+        Returns:
+            dict: Description of return value.
+        """
         signature = self.get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
 
-        base_prompt = f"""Task: Extract argument values directly from the request.
+        base_prompt = f"""Task: Extract argument values directly from the \
+request.
 Rules:
 1. Do not calculate, solve or compute math.
 2. Copy exact words or values.

@@ -6,9 +6,11 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 13:15:18 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:25:19 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:43:07 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
+
+"""Module that contains the loader file for the program."""
 
 import json
 
@@ -21,6 +23,7 @@ class Loader:
     def load_func_defs(self, path: str) -> list[FunctionDefinition]:
         """
         Load the function definition file.
+
         Args:
             path (str): The path of the file.
         Returns:
@@ -28,7 +31,10 @@ class Loader:
         """
         with open(path, "r") as r:
             result = json.load(r)
-        return [FunctionDefinition.model_validate(func_defs) for func_defs in result]
+        return [
+            FunctionDefinition.model_validate(func_defs)
+            for func_defs in result
+        ]
 
     def load_prompts(self, path: str) -> list[Prompt]:
         """
@@ -42,4 +48,3 @@ class Loader:
         with open(path, "r") as file:
             result = json.load(file)
         return [Prompt.model_validate(prompt) for prompt in result]
-

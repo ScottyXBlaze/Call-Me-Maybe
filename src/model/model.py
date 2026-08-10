@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/21 16:44:05 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:25:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:40:18 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 class Prompt(BaseModel):
     """Class that contains the prompt."""
+
     prompt: str = Field()
 
 

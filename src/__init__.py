@@ -6,9 +6,11 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 14:37:58 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:00:54 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:38:38 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
+
+"""Package that contains the basic program of the project."""
 
 from .parsers import Checker
 

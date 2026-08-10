@@ -6,17 +6,26 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 09:53:19 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 14:46:01 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:44:12 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
-from model.model import FunctionCallResult
+"""Module that contain the basic saver for the program."""
+
+from ..model import FunctionCallResult
 
 
 class Saver:
-    def __init__(self, output_file: str) -> None:
-        self.output_file = output_file
+    """Class that contains method to save the function call result json."""
 
-    def save_function_calls(self, results: list[FunctionCallResult]) -> None:
-        serialized_output = [result.model_dump() for result in results]
-        print(serialized_output)
+    # TODO: Add the saving class
+    def save_function_calls(
+        self, results: list[FunctionCallResult], path: str
+    ) -> None:
+        """
+        Save the function calls data into a file.
+
+        Args:
+            results (list[FunctionCallResult]): The list of function calls.
+            path (str): The path of the file.
+        """

@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:00:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/10 15:42:29 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -17,7 +17,17 @@ import sys
 
 
 class ArgumentError(Exception):
-    ...
+    """Basic argument error class."""
+
+    def __init__(self, *args: object) -> None:
+        """
+        Everything starts here.
+
+        Args:
+            args (object): Arguments to show in the error.
+        """
+        super().__init__(*args)
+
 
 class Checker:
     """Class That checks if the parameter is Valid or not."""
@@ -78,7 +88,6 @@ class Checker:
                     pass
             except (PermissionError, IsADirectoryError, OSError) as e:
                 raise ArgumentError(f"Invalid input argument {e}")
-
 
     def verify_input(self, path: str) -> None:
         """
