@@ -6,12 +6,12 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 10:24:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 14:06:46 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 
-from ..model import FunctionDefinition, Prompt
+from ..model import FunctionCallResult, FunctionDefinition, Prompt
 from .tokenizer import Tokenizer
 
 
@@ -31,4 +31,4 @@ class MyLLM:
 
     def generate_func_call(self, prompt: Prompt) -> None: ...
 
-    def run(self) -> None: ...
+    def run(self) -> list[FunctionCallResult]: ...

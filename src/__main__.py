@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 13:58:03 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 14:08:48 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -17,20 +17,19 @@ import sys
 
 from pydantic import ValidationError
 
-from src.parsers.checker import ArgumentError
-
-from .parsers import Checker, Loader
+from .llm import MyLLM
+from .parsers import ArgumentError, Checker, Loader, Saver
 
 
 def main():
     checker = Checker()
     loader = Loader()
-
     try:
         arguments = checker.check_args(sys.argv[1:])
     except ArgumentError as e:
         print(f"[ERROR] {e}")
         sys.exit(1)
+
     try:
         func_defs = loader.load_func_defs(
             arguments.get(
@@ -48,8 +47,14 @@ def main():
         for error in e.errors():
             print(f"[ERROR] Invalid format for file: {error}")
         sys.exit(1)
-    print(*[model.model_dump() for model in func_defs], sep="\n")
-    print(*[model.model_dump() for model in prompts], sep="\n")
+
+    my_llm = MyLLM(func_defs, prompts)
+    saver = Saver()
+    result = my_llm.run()
+    saver.save_function_calls(result, arguments.get("--output", "data/output/function_calls.json"))
+
+
+
 
 
 if __name__ == "__main__":
