@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 14:08:48 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 14:11:04 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -22,6 +22,7 @@ from .parsers import ArgumentError, Checker, Loader, Saver
 
 
 def main():
+    """Serve as a main entry point."""
     checker = Checker()
     loader = Loader()
     try:
@@ -51,10 +52,9 @@ def main():
     my_llm = MyLLM(func_defs, prompts)
     saver = Saver()
     result = my_llm.run()
-    saver.save_function_calls(result, arguments.get("--output", "data/output/function_calls.json"))
-
-
-
+    saver.save_function_calls(
+        result, arguments.get("--output", "data/output/function_calls.json")
+    )
 
 
 if __name__ == "__main__":
