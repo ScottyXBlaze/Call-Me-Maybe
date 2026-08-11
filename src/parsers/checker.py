@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 13:46:14 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 14:00:05 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -17,15 +17,6 @@ import os
 
 class ArgumentError(Exception):
     """Basic argument error class."""
-
-    def __init__(self, *args: object) -> None:
-        """
-        Everything starts here.
-
-        Args:
-            args (object): Arguments to show in the error.
-        """
-        super().__init__(*args)
 
 
 class Checker:
@@ -56,7 +47,6 @@ class Checker:
             elif i + 1 >= len(args):
                 raise ArgumentError(f"Missing value for parameter {flag}")
             self._validate_params(flag, args[i + 1])
-            print(args[i], args[i + 1])
             self._arguments[flag] = args[i + 1]
             i += 2
         return self._arguments
@@ -81,8 +71,6 @@ class Checker:
             path (str): the path of the file.
         """
         dirname = os.path.dirname(path)
-        print("This is a dirname:")
-        print(dirname)
         if dirname:
             try:
                 os.makedirs(dirname, exist_ok=True)
