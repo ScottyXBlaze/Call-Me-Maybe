@@ -6,14 +6,13 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:42:29 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 13:46:14 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """Module That contains the basic argument checker for the program."""
 
 import os
-import sys
 
 
 class ArgumentError(Exception):
@@ -34,7 +33,7 @@ class Checker:
 
     def __init__(self) -> None:
         """Everything starts here."""
-        self.arguments = {
+        self._arguments = {
             "--functions_definition": "data/input/functions_definition.json",
             "--input": "data/input/function_calling_tests.json",
             "--output": "data/output/function_calls.json",
@@ -52,16 +51,17 @@ class Checker:
         i = 0
         while i < len(args):
             flag = args[i]
-            if flag not in self.arguments:
+            if flag not in self._arguments:
                 raise ArgumentError(f"Parameter {flag} is invalid.")
             elif i + 1 >= len(args):
                 raise ArgumentError(f"Missing value for parameter {flag}")
-            self.validate_params(flag, args[i + 1])
-            self.arguments[flag] = sys.argv[i + 1]
+            self._validate_params(flag, args[i + 1])
+            print(args[i], args[i + 1])
+            self._arguments[flag] = args[i + 1]
             i += 2
-        return self.arguments
+        return self._arguments
 
-    def validate_params(self, params: str, path: str) -> None:
+    def _validate_params(self, params: str, path: str) -> None:
         """
         Validate the parameter.
 
@@ -70,10 +70,10 @@ class Checker:
             path (str): The path of the file.
         """
         if params == "--output":
-            self.verify_output(path)
-        self.verify_input(path)
+            self._verify_output(path)
+        self._verify_input(path)
 
-    def verify_output(self, path: str) -> None:
+    def _verify_output(self, path: str) -> None:
         """
         Verify if we can make the directory.
 
@@ -81,15 +81,20 @@ class Checker:
             path (str): the path of the file.
         """
         dirname = os.path.dirname(path)
+        print("This is a dirname:")
+        print(dirname)
         if dirname:
             try:
                 os.makedirs(dirname, exist_ok=True)
-                with open(path, "w") as _:
-                    pass
-            except (PermissionError, IsADirectoryError, OSError) as e:
-                raise ArgumentError(f"Invalid input argument {e}")
+            except OSError as e:
+                raise ArgumentError(f"Cannot create path directory: {e}.")
+        try:
+            with open(path, "w") as _:
+                pass
+        except (PermissionError, IsADirectoryError, OSError) as e:
+            raise ArgumentError(f"Cannot create file {path}: {e}")
 
-    def verify_input(self, path: str) -> None:
+    def _verify_input(self, path: str) -> None:
         """
         Try to read a file.
 

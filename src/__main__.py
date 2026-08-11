@@ -6,27 +6,33 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/10 15:40:06 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 13:47:11 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """Module that contains the main entry point of the program."""
 
-from .my_llm import My_LLM
+import sys
+
+from .parsers import Checker, Loader
 
 
-class Main:
-    """Main entry point of the program."""
+def main():
+    checker = Checker()
+    loader = Loader()
 
-    def __init__(self) -> None:
-        """Everything starts here."""
-        self.my_llm = My_LLM()
-
-    def run(self) -> None:
-        """Run the program."""
-        self.my_llm.run()
-
+    arguments = checker.check_args(sys.argv[1:])
+    print(arguments)
+    func_defs = loader.load_func_defs(
+        arguments.get(
+            "--functions_definition", "data/input/function_calling_tests.json"
+        )
+    )
+    prompts = loader.load_prompts(
+        arguments.get("--input", "data/input/functions_definition.json")
+    )
+    print(*[model.model_dump() for model in func_defs], sep="\n")
+    print(*[model.model_dump() for model in prompts], sep="\n")
 
 if __name__ == "__main__":
-    main = Main()
-    main.run()
+    main()
