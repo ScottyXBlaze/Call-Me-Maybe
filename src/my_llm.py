@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/04 22:58:41 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 15:58:53 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 15:28:35 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -15,7 +15,9 @@
 import json
 import logging
 from collections.abc import Generator
-from typing import Any from llm_sdk import Small_LLM_Model
+from typing import Any
+
+from llm_sdk import Small_LLM_Model
 
 from .model import FunctionCallResult, FunctionDefinition
 from .parser import Parser

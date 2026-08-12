@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 14:49:47 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 15:45:58 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -29,6 +29,11 @@ class MyLLM:
             f"- {a.name}: {a.description}\n" for a in self._func_defs
         ]
         self._argument_generator = ArgumentGenerator(self._tokenizer)
+        self._valid_type = {
+            "number": self._tokenizer.get_token("number"),
+            "boolean": self._tokenizer.get_token("boolean"),
+            "string": self._tokenizer.get_token("string"),
+        }
 
     def generate_func_name(
         self, prompt: Prompt, func_name_token: list[list[int]]
@@ -49,12 +54,35 @@ Functions:
 
 {prompt}
 Function: """
-        decoded_name = self._argument_generator.generate_from_tokens(tmp_prompt, func_name_token)
+        decoded_name = self._argument_generator.generate_from_tokens(
+            tmp_prompt, func_name_token
+        )
         return {"name": decoded_name}
 
     def generate_func_args(
         self, prompt: Prompt, func_name: str
     ) -> dict[str, Any]:
+        signature = self.get_func_signature(func_name)
+        if not signature:
+            return {"parameters": {}}
+        base_prompt = f"""Task: Extract argument values directly from the \
+request.
+Rules:
+1. Do not calculate, solve or compute math.
+2. Copy exact words or values.
+3. When a parameters is finished, put a new line '\n'.
+
+Request: "{prompt}"
+Function: {func_name}
+Function signature: {signature}
+
+JSON Output:
+"""
+        params_items = list(signature.items())
+        print(params_items)
+        for index, (param_name, param_info) in enumerate(params_items):
+            parameter_type = self.get_param_type(param_info)
+            print(parameter_type)
         return {"parameters": {}}
 
     def generate_func_arg(self) -> None: ...
@@ -67,7 +95,7 @@ Function: """
         result.update(self.generate_func_args(prompt, result["name"]))
         return FunctionCallResult.model_validate(result)
 
-    def get_func_signature(self, func_name) -> dict[str, Any]:
+    def get_func_signature(self, func_name: str) -> dict[str, Any]:
         for func in self._func_defs:
             if func_name == func.name:
                 value = {
@@ -76,6 +104,20 @@ Function: """
                 }
                 return value
         return {}
+
+    def get_param_type(self, p_type: str) -> str:
+        tmp_prompt = f"""Choose the best name that match the string.
+
+list of name: {self._valid_type}
+String: {p_type}
+Best match: """
+        func_tokens = []
+        for base_type in self._valid_type:
+            func_tokens += self._tokenizer.get_token(base_type)
+        decoded_name = self._argument_generator.generate_from_tokens(
+            tmp_prompt, func_tokens
+        )
+        return decoded_name
 
     def run(self) -> list[FunctionCallResult]:
         result: list[FunctionCallResult] = []
