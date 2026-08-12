@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 14:00:05 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 14:11:29 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -79,7 +79,7 @@ class Checker:
         try:
             with open(path, "w") as _:
                 pass
-        except (PermissionError, IsADirectoryError, OSError) as e:
+        except (PermissionError, IsADirectoryError, OSError, ValueError) as e:
             raise ArgumentError(f"Cannot create file {path}: {e}")
 
     def _verify_input(self, path: str) -> None:
@@ -92,5 +92,5 @@ class Checker:
         try:
             with open(path, "r"):
                 pass
-        except (PermissionError, IsADirectoryError, OSError) as e:
+        except (PermissionError, IsADirectoryError, OSError, ValueError) as e:
             raise ArgumentError(f"Invalid input argument {e}")

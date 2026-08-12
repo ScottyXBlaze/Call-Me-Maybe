@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 08:17:12 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 14:49:47 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -33,10 +33,9 @@ class MyLLM:
     def generate_func_name(
         self, prompt: Prompt, func_name_token: list[list[int]]
     ) -> dict[str, str]:
-        tmp_prompt = f"""
-Choose the exact function name from the list that best answers the prompt.
+        tmp_prompt = f"""Choose the exact function name from the list that best answers the prompt.
 
-### Example 1
+### Example
 Functions:
 - calculate_sum: Adds two numbers
 - convert_to_upper: Converts text to uppercase
