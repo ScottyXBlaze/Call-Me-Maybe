@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 14:50:44 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/11 16:03:06 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -16,6 +16,12 @@ from llm_sdk import Small_LLM_Model
 class Tokenizer:
     def __init__(self) -> None:
         self._model = Small_LLM_Model()
+
+    def get_tokens(self, strings: list[str]) -> list[list[int]]:
+        result = []
+        for string in strings:
+            result += self.get_token(string)
+        return result
 
     def get_token(self, string: str) -> list[list[int]]:
         """
@@ -52,3 +58,6 @@ class Tokenizer:
 
     def decode(self, tokens: list[int]) -> str:
         return self._model.decode(tokens)
+
+    def get_logits_from_input_ids(self, tokens: list[int]) -> list[float]:
+        return self._model.get_logits_from_input_ids(tokens)

@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 14:54:21 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 07:03:31 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,6 +14,7 @@
 from typing import Any
 
 from ..model import FunctionCallResult, FunctionDefinition, Prompt
+from .generator import ArgumentGenerator
 from .tokenizer import Tokenizer
 
 
@@ -27,6 +28,7 @@ class MyLLM:
         self._func_desc = [
             f"- {a.name}: {a.description}\n" for a in self._func_defs
         ]
+        self._argument_generator = ArgumentGenerator(self._tokenizer)
 
     def generate_func_name(
         self, prompt: Prompt, func_name_token: list[list[int]]
@@ -48,37 +50,13 @@ Functions:
 
 {prompt}
 Function: """
-        func_name: list[int] = []
-        i = 0
-
-        while True:
-            candidates = [
-                seq
-                for seq in func_name_token
-                if len(seq) > i and seq[:i] == func_name
-            ]
-
-            if not candidates:
-                break
-
-            allowed_tokens = {seq[i] for seq in candidates}
-
-            token = self._tokenizer.get_best_token(tmp_prompt, allowed_tokens)
-
-            func_name.append(token)
-            tmp_prompt += self._tokenizer.decode([token])
-            i += 1
-
-            if func_name in func_name_token:
-                break
-
-        decoded_name = self._tokenizer.decode(func_name).strip()
+        decoded_name = self._argument_generator.generate_from_list(tmp_prompt, func_name_token)
         return {"name": decoded_name}
 
     def generate_func_args(
         self, prompt: Prompt, func_name: str
     ) -> dict[str, Any]:
-        return {"parameters": {"a": 2}}
+        return {}
 
     def generate_func_arg(self) -> None: ...
 
@@ -90,6 +68,16 @@ Function: """
         result.update(self.generate_func_args(prompt, result["name"]))
         print(result)
         return FunctionCallResult.model_validate(result)
+
+    def get_func_signature(self, func_name) -> dict[str, Any]:
+        for func in self._func_defs:
+            if func_name == func.name:
+                value = {
+                    k: "".join(str(x) for x in v.model_dump().values() if x)
+                    for k, v in func.parameters.items()
+                }
+                return value
+        return {}
 
     def run(self) -> list[FunctionCallResult]:
         result: list[FunctionCallResult] = []
