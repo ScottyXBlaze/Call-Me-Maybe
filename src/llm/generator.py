@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 07:02:19 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 08:16:44 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -134,27 +134,23 @@ class ArgumentGenerator:
 
         return val_str.strip()
 
-    def generate_from_list(self, prompt: str, allowed_tokens: list[list[int]]) -> str:
+    def generate_from_tokens(self, prompt: str, allowed_tokens: list[list[int]]) -> str:
         result: list[int] = []
         i = 0
         while True:
             candidates = [
                 seq
-                for seq in self._valid_type
+                for seq in allowed_tokens
                 if len(seq) > i and seq[:i] == result
             ]
             if not candidates:
                 break
-
             allowed_token = {seq[i] for seq in candidates}
-
             best_token = self._tokenizer.get_best_token(prompt, allowed_token)
-
             result.append(best_token)
             prompt += self._tokenizer.decode([best_token])
             i += 1
-
-            if result in self._valid_type:
+            if result in allowed_tokens:
                 break
 
         return self._tokenizer.decode(result).strip()

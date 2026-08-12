@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 07:03:31 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 08:17:12 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -50,13 +50,13 @@ Functions:
 
 {prompt}
 Function: """
-        decoded_name = self._argument_generator.generate_from_list(tmp_prompt, func_name_token)
+        decoded_name = self._argument_generator.generate_from_tokens(tmp_prompt, func_name_token)
         return {"name": decoded_name}
 
     def generate_func_args(
         self, prompt: Prompt, func_name: str
     ) -> dict[str, Any]:
-        return {}
+        return {"parameters": {}}
 
     def generate_func_arg(self) -> None: ...
 
@@ -66,7 +66,6 @@ Function: """
         result = {"prompt": prompt.prompt}
         result.update(self.generate_func_name(prompt, func_name_tokens))
         result.update(self.generate_func_args(prompt, result["name"]))
-        print(result)
         return FunctionCallResult.model_validate(result)
 
     def get_func_signature(self, func_name) -> dict[str, Any]:
