@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 16:03:06 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 15:57:46 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -59,5 +59,9 @@ class Tokenizer:
     def decode(self, tokens: list[int]) -> str:
         return self._model.decode(tokens)
 
+    def encode(self, string: str) -> list[int]:
+        return self._model.encode(string).tolist()[0]
+
     def get_logits_from_input_ids(self, tokens: list[int]) -> list[float]:
         return self._model.get_logits_from_input_ids(tokens)
+

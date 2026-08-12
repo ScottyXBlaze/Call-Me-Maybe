@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 15:45:58 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 16:09:02 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -74,16 +74,41 @@ Rules:
 
 Request: "{prompt}"
 Function: {func_name}
-Function signature: {signature}
 
 JSON Output:
 """
+        buffer = "{\n"
+        result = {}
         params_items = list(signature.items())
         print(params_items)
         for index, (param_name, param_info) in enumerate(params_items):
             parameter_type = self.get_param_type(param_info)
-            print(parameter_type)
-        return {"parameters": {}}
+
+            if parameter_type == "string":
+                prefix = f'    "{param_name}": "'
+            else:
+                prefix = f'    "{param_name}": '
+
+            buffer += prefix
+            current_prompt = base_prompt + buffer
+            value = self._argument_generator.get_arg_value(
+                current_prompt, param_name, parameter_type
+            )
+            result[param_name] = value
+            if parameter_type == "string":
+                buffer += f'{value}"'
+            elif parameter_type == "boolean":
+                buffer += "true" if value else "false"
+            else:
+                buffer += str(value)
+
+            if index < len(params_items) - 1:
+                buffer += ",\n"
+            else:
+                buffer += "\n}"
+
+        print(result)
+        return {"parameters": result}
 
     def generate_func_arg(self) -> None: ...
 

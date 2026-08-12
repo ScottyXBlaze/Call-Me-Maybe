@@ -6,10 +6,12 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 08:16:44 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/12 15:58:59 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
+
+from typing import Any
 
 from .tokenizer import Tokenizer
 
@@ -133,6 +135,14 @@ class ArgumentGenerator:
             input_ids.append(best_token)
 
         return val_str.strip()
+
+    def get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
+        input_ids = self._tokenizer.encode(prompt)
+        if p_type == "number":
+            return self._get_number_value(input_ids)
+        elif p_type == "boolean":
+            return self._get_bool_value(input_ids)
+        return self._get_string_value(input_ids)
 
     def generate_from_tokens(self, prompt: str, allowed_tokens: list[list[int]]) -> str:
         result: list[int] = []
