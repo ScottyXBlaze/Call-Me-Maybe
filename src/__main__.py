@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:21:57 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 16:29:11 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -22,7 +22,7 @@ from .model import FunctionCallResult, FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 
 
-def main():
+def main() -> None:
     """Serve as a main entry point."""
     checker = Checker()
     loader = Loader()

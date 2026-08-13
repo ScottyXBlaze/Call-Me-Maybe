@@ -5,17 +5,13 @@
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/10 16:44:32 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 16:16:46 by nyramana        ###   ########.fr        #
+#    Created: 2026/08/13 16:31:49 by nyramana         #+#    #+#              #
+#    Updated: 2026/08/13 16:31:49 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """
-Package that contains all the LLM implementation.
+Main Progam package.
 
-There are a lot of llm implementation here like Finite State Machine,
-constrained decoding, Custom LLM method, ...
+It is here to easily sync all the package.
 """
-from .llm import MyLLM
-
-__all__ = ["MyLLM"]

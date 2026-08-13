@@ -6,24 +6,41 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:10:29 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 16:17:01 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
+"""Module that contain a generator class for the constrained decoding."""
 
 from typing import Any
 
 from .tokenizer import Tokenizer
 
 
-class ArgumentGenerator:
+class Generator:
+    """Generator class that helps with constrained decoding."""
+
     def __init__(self, tokenizer: Tokenizer) -> None:
+        """
+        Contain helper method to generate valid data from the llm.
+
+        Args:
+            tokenizer (Tokenizer): The tokenizer class.
+        """
         self._tokenizer = tokenizer
         self._valid_type = self._tokenizer.get_tokens(
             ["boolean", "string", "number", "integer"]
         )
 
     def _get_integer_value(self, input_ids: list[int]) -> int:
+        """
+        Get an integer value from the llm based on input_ids.
+
+        Args:
+            input_ids (list[int]): The list of tokens / input_ids.
+        Returns:
+            int: The value gaved by the llm.
+        """
         val_str = ""
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
@@ -61,6 +78,14 @@ class ArgumentGenerator:
             return 0
 
     def _get_number_value(self, input_ids: list[int]) -> float:
+        """
+        Get a float or double value from the llm based on input_ids.
+
+        Args:
+            input_ids (list[int]): The list of tokens / input_ids.
+        Returns:
+            float: The value gaved by the llm.
+        """
         val_str = ""
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
@@ -99,10 +124,12 @@ class ArgumentGenerator:
 
     def _get_bool_value(self, input_ids: list[int]) -> bool:
         """
-        Constrained decoding for a boolean argument.
+        Get a boolean value from the llm based on input_ids.
 
-        Only allows tokens that are a strict prefix of 'true' or 'false',
-        exactly like the function-name selection does.
+        Args:
+            input_ids (list[int]): The list of tokens / input_ids.
+        Returns:
+            bool: The value gaved by the llm.
         """
         candidates = ["true", "false"]
 
@@ -116,10 +143,12 @@ class ArgumentGenerator:
 
     def _get_string_value(self, input_ids: list[int]) -> str:
         """
-        Constrained decoding for a string argument.
+        Get a string value from the llm based on input_ids.
 
-        Stops as soon as a token contains a closing quote or newline,
-        instead of running unconstrained until an arbitrary token limit.
+        Args:
+            input_ids (list[int]): The list of tokens / input_ids.
+        Returns:
+            str: The value gaved by the llm.
         """
         val_str = ""
         for _ in range(40):
@@ -152,6 +181,16 @@ class ArgumentGenerator:
         return val_str.strip()
 
     def get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
+        """
+        Generate a value of a parameters based on the prompt and type.
+
+        Args:
+            prompt (str): The initial prompt to give to the llm.
+            param_name (str): The name of the parameter to generate.
+            p_type (str): The type of the parameter.
+        Returns:
+            Any: The value gaved by the llm.
+        """
         input_ids = self._tokenizer.encode(prompt)
         if p_type == "number":
             return self._get_number_value(input_ids)
@@ -160,4 +199,3 @@ class ArgumentGenerator:
         elif p_type == "boolean":
             return self._get_bool_value(input_ids)
         return self._get_string_value(input_ids)
-

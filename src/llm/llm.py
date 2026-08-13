@@ -6,29 +6,45 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:14:30 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 16:30:25 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
+"""Module that contains the main file for the llm."""
 
 from typing import Any
 
 from ..model import FunctionCallResult, FunctionDefinition, Prompt
-from .generator import ArgumentGenerator
+from .generator import Generator
 from .tokenizer import Tokenizer
 
 
 class MyLLM:
+    """
+    The Base class for the LLM.
+
+    Here belongs the main part of the program where we use the constrained
+    decoding, the finite state machine, and much more to return the json file.
+    """
+
     def __init__(
         self, func_defs: list[FunctionDefinition], prompts: list[Prompt]
     ) -> None:
+        """
+        Everything starts here.
+
+        Args:
+            func_defs (list[FunctionDefinition]): The list of function
+            definitions.
+            prompts (list[Prompt]): The list of prompts.
+        """
         self._tokenizer = Tokenizer()
         self._func_defs = func_defs
         self._prompts = prompts
         self._func_desc = [
             f"- {a.name}: {a.description}\n" for a in self._func_defs
         ]
-        self._argument_generator = ArgumentGenerator(self._tokenizer)
+        self._argument_generator = Generator(self._tokenizer)
 
         self._valid_type = {
             "number": self._tokenizer.get_token("number"),
@@ -40,7 +56,17 @@ class MyLLM:
     def generate_func_name(
         self, prompt: Prompt, func_name_token: list[list[int]]
     ) -> dict[str, str]:
-        tmp_prompt = f"""Choose the exact function name from the list that best answers the prompt.
+        """
+        Generate the name of the function.
+
+        Args:
+            prompt (Prompt): The initial prompt or question.
+            func_name_token (list[list[int]]): The list of valid token.
+        Returns:
+            dict: A dictionnary that contains the function name with it's key.
+        """
+        tmp_prompt = f"""
+Choose the exact function name from the list that best answers the prompt.
 
 ### Example
 Functions:
@@ -65,11 +91,22 @@ Function: """
     def generate_func_args(
         self, prompt: Prompt, func_name: str
     ) -> dict[str, Any]:
+        """
+        Generate the function arguments based on the function name and prompt.
+
+        Args:
+            prompt (Prompt): The initial prompt / question.
+            func_name (str): The name of the function.
+        Returns:
+            dict: A dictionnary that contains the function
+            arguments with it's key.
+        """
         signature = self.get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
         signature_txt = [f"{k}: {v}" for k, v in signature.items()]
-        base_prompt = f"""Task: Fill the parameters values for {func_name} based on the request.
+        base_prompt = f"""
+Task: Fill the parameters values for {func_name} based on the request.
 
 Request: "{prompt.prompt}"
 Function name and signature: {func_name}({", ".join(signature_txt)})
@@ -107,17 +144,32 @@ Parameter in JSON format:
 
         return {"parameters": result}
 
-    def generate_func_arg(self) -> None: ...
-
     def generate_func_call(
-        self, prompt: Prompt, func_name_tokens
+        self, prompt: Prompt, func_name_tokens: list[list[int]]
     ) -> FunctionCallResult:
+        """
+        Generate the function call class.
+
+        Args:
+            prompt (Prompt): The initial prompt.
+            func_name_tokens (Any): The list of valid token for the func_name.
+        Returns:
+            FunctionCallResult: The function call class.
+        """
         result = {"prompt": prompt.prompt}
         result.update(self.generate_func_name(prompt, func_name_tokens))
         result.update(self.generate_func_args(prompt, result["name"]))
         return FunctionCallResult.model_validate(result)
 
     def get_func_signature(self, func_name: str) -> dict[str, Any]:
+        """
+        Generate the function signature based on function name.
+
+        Args:
+            func_name (str): The name of the function.
+        Returns:
+            dict: The dictionnary that contains the parameters with it's type.
+        """
         for func in self._func_defs:
             if func_name == func.name:
                 value = {
@@ -128,6 +180,15 @@ Parameter in JSON format:
         return {}
 
     def get_param_type(self, p_type: str) -> str:
+        """
+        Generate the type of parameters to match only the allowed one.
+
+        Args:
+            p_type (str): A type of parameters, preferably 'number', 'integer'
+            'boolean', or 'string'.
+        Returns:
+            str: The allowed type.
+        """
         tmp_prompt = f"""Choose the best name that match the string.
 
 list of name: {self._valid_type}
@@ -142,6 +203,12 @@ Best match: """
         return decoded_name
 
     def run(self) -> list[FunctionCallResult]:
+        """
+        Run the generation of the function call.
+
+        Returns:
+            list: The list of function call class.
+        """
         result: list[FunctionCallResult] = []
         func_tokens = []
         for func in self._func_defs:

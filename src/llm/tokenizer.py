@@ -6,18 +6,33 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:42:48 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 16:30:01 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
+
+"""Module that contains the tokenizer class."""
+
+from typing import Any
 
 from llm_sdk import Small_LLM_Model
 
 
 class Tokenizer:
+    """Contain the basics of tokenization and detokenization."""
+
     def __init__(self) -> None:
+        """Everything starts here."""
         self._model = Small_LLM_Model()
 
     def get_tokens(self, strings: list[str]) -> list[list[int]]:
+        """
+        Get the list of allowed tokens based on a list of strings.
+
+        Args:
+            strings (list[str]): The list of string to be allowed.
+        Returns:
+            list: List of the allowed tokens.
+        """
         result = []
         for string in strings:
             result += self.get_token(string)
@@ -25,12 +40,13 @@ class Tokenizer:
 
     def get_token(self, string: str) -> list[list[int]]:
         """
-        Get the token version of the name of the function.
+        Get the token version of a string.
 
+        It also check the string with a space before to be more accurate.
         Args:
-            func_names (list[str]): The name of the function.
+            string (str): The string to transfom.
         Returns:
-            list: List of the token.
+            list: The list of possible token.
         """
         result = []
         tokens_raw = self._model.encode(string).tolist()[0]
@@ -43,6 +59,15 @@ class Tokenizer:
         return result
 
     def get_best_token(self, string: str, allowed_tokens: set[int]) -> int:
+        """
+        Get the best token based on the allowed tokens.
+
+        Args:
+            string (str): The initial string / prompt.
+            allowed_tokens (set[int]): The set of allowed token.
+        Returns:
+            int: The most probable token.
+        """
         input_ids = self._model.encode(string).tolist()[0]
         logits = self._model.get_logits_from_input_ids(input_ids)
 
@@ -59,6 +84,18 @@ class Tokenizer:
     def generate_from_tokens(
         self, prompt: str, allowed_tokens: list[list[int]]
     ) -> str:
+        """
+        Generate tokens amoung the list of allowed token.
+
+        It use a tricky way of constrained decoding where instead of
+        setting every forbiden token, we only check the probabily with
+        the allowed token.
+        Args:
+            prompt (str): The initial prompt.
+            allowed_tokens (list[list[int]]): The list of allowed_token.
+        Returns:
+            str: The decoded value from one of the allowed token.
+        """
         result: list[int] = []
         i = 0
         while True:
@@ -82,10 +119,34 @@ class Tokenizer:
         return self.decode(result).strip()
 
     def decode(self, tokens: list[int]) -> str:
+        """
+        Decode a token and return the string.
+
+        Args:
+            tokens (list[int]): The token.
+        Returns:
+            str: The string gaved by the model.
+        """
         return self._model.decode(tokens)
 
-    def encode(self, string: str) -> list[int]:
+    def encode(self, string: str) -> Any:
+        """
+        Encode a string and return the token.
+
+        Args:
+            string (str): The string.
+        Returns:
+            str: The list of token.
+        """
         return self._model.encode(string).tolist()[0]
 
     def get_logits_from_input_ids(self, tokens: list[int]) -> list[float]:
+        """
+        Get the logits based on the tokens.
+
+        Args:
+            tokens (list[int]): The list of token.
+        Returns:
+            list: The list of probability.
+        """
         return self._model.get_logits_from_input_ids(tokens)
