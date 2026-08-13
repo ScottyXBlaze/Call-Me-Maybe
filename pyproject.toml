@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "blessed>=1.48.0",
     "flake8>=7.3.0",
     "flake8-docstrings>=1.7.0",
     "llm-sdk>=1.0.1",
