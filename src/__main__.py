@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/11 14:11:04 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 15:21:57 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -18,6 +18,7 @@ import sys
 from pydantic import ValidationError
 
 from .llm import MyLLM
+from .model import FunctionCallResult, FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 
 
@@ -32,15 +33,10 @@ def main():
         sys.exit(1)
 
     try:
-        func_defs = loader.load_func_defs(
-            arguments.get(
-                "--functions_definition",
-                "data/input/function_calling_tests.json",
-            )
+        func_defs: list[FunctionDefinition] = loader.load_func_defs(
+            arguments["--functions_definition"]
         )
-        prompts = loader.load_prompts(
-            arguments.get("--input", "data/input/functions_definition.json")
-        )
+        prompts: list[Prompt] = loader.load_prompts(arguments["--input"])
     except json.JSONDecodeError as e:
         print(f"[ERROR] Invalid json file: {e}")
         sys.exit(1)
@@ -51,10 +47,8 @@ def main():
 
     my_llm = MyLLM(func_defs, prompts)
     saver = Saver()
-    result = my_llm.run()
-    saver.save_function_calls(
-        result, arguments.get("--output", "data/output/function_calls.json")
-    )
+    result: list[FunctionCallResult] = my_llm.run()
+    saver.save_function_calls(result, arguments["--output"])
 
 
 if __name__ == "__main__":
