@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 16:09:02 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 14:58:56 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -33,6 +33,7 @@ class MyLLM:
             "number": self._tokenizer.get_token("number"),
             "boolean": self._tokenizer.get_token("boolean"),
             "string": self._tokenizer.get_token("string"),
+            "integer": self._tokenizer.get_token("integer"),
         }
 
     def generate_func_name(
@@ -52,7 +53,7 @@ Function: calculate_sum
 Functions:
 {''.join(self._func_desc)}
 
-{prompt}
+prompt:'{prompt.prompt}'
 Function: """
         decoded_name = self._argument_generator.generate_from_tokens(
             tmp_prompt, func_name_token
@@ -65,22 +66,17 @@ Function: """
         signature = self.get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
-        base_prompt = f"""Task: Extract argument values directly from the \
-request.
-Rules:
-1. Do not calculate, solve or compute math.
-2. Copy exact words or values.
-3. When a parameters is finished, put a new line '\n'.
+        signature_txt = [f"{k}: {v}" for k, v in signature.items()]
+        base_prompt = f"""Task: Fill the parameters values for {func_name} based on the request.
 
-Request: "{prompt}"
-Function: {func_name}
+Request: "{prompt.prompt}"
+Function name and signature: {func_name}({", ".join(signature_txt)})
 
-JSON Output:
+Parameter in JSON format:
 """
         buffer = "{\n"
         result = {}
         params_items = list(signature.items())
-        print(params_items)
         for index, (param_name, param_info) in enumerate(params_items):
             parameter_type = self.get_param_type(param_info)
 
@@ -107,7 +103,6 @@ JSON Output:
             else:
                 buffer += "\n}"
 
-        print(result)
         return {"parameters": result}
 
     def generate_func_arg(self) -> None: ...

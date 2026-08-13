@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/12 15:57:46 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 14:38:37 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -65,3 +65,7 @@ class Tokenizer:
     def get_logits_from_input_ids(self, tokens: list[int]) -> list[float]:
         return self._model.get_logits_from_input_ids(tokens)
 
+# fn_add_numbers -> 1000, 1881, 31847, 1987
+# fn_greet -> 1000, 3174, 13498
+# fn_mult -> 1000, 13483, 19348
+# [1000, 3174, 13498]
