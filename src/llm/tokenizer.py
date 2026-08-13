@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 14:38:37 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 15:10:06 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -55,6 +55,31 @@ class Tokenizer:
                 best_token = token_id
 
         return best_token
+
+    def generate_from_tokens(
+        self, prompt: str, allowed_tokens: list[list[int]]
+    ) -> str:
+        result: list[int] = []
+        i = 0
+        while True:
+            candidates = [
+                seq
+                for seq in allowed_tokens
+                if len(seq) > i and seq[:i] == result
+            ]
+            if not candidates:
+                break
+            allowed_token = {seq[i] for seq in candidates}
+            if len(allowed_token) > 1:
+                best_token = self.get_best_token(prompt, allowed_token)
+            else:
+                best_token = allowed_token.pop()
+            result.append(best_token)
+            prompt += self.decode([best_token])
+            i += 1
+            if result in allowed_tokens:
+                break
+        return self.decode(result).strip()
 
     def decode(self, tokens: list[int]) -> str:
         return self._model.decode(tokens)

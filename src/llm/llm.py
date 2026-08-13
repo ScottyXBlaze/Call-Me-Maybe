@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 14:58:56 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/13 15:14:30 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -29,6 +29,7 @@ class MyLLM:
             f"- {a.name}: {a.description}\n" for a in self._func_defs
         ]
         self._argument_generator = ArgumentGenerator(self._tokenizer)
+
         self._valid_type = {
             "number": self._tokenizer.get_token("number"),
             "boolean": self._tokenizer.get_token("boolean"),
@@ -55,9 +56,10 @@ Functions:
 
 prompt:'{prompt.prompt}'
 Function: """
-        decoded_name = self._argument_generator.generate_from_tokens(
+        decoded_name = self._tokenizer.generate_from_tokens(
             tmp_prompt, func_name_token
         )
+        print(decoded_name)
         return {"name": decoded_name}
 
     def generate_func_args(
@@ -134,7 +136,7 @@ Best match: """
         func_tokens = []
         for base_type in self._valid_type:
             func_tokens += self._tokenizer.get_token(base_type)
-        decoded_name = self._argument_generator.generate_from_tokens(
+        decoded_name = self._tokenizer.generate_from_tokens(
             tmp_prompt, func_tokens
         )
         return decoded_name
