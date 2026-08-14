@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 00:03:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:48:43 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,7 +14,11 @@
 
 from typing import Any
 
-from .statemachine import IntegerStateMachine, NumberStateMachine
+from .statemachine import (
+    IntegerStateMachine,
+    NumberStateMachine,
+    StringStateMachine,
+)
 from .tokenizer import Tokenizer
 
 
@@ -69,7 +73,6 @@ class Generator:
             return int(machine.value)
         except ValueError:
             return 0
-
 
     def _get_number_value(self, input_ids: list[int]) -> float:
         machine = NumberStateMachine()
@@ -128,43 +131,44 @@ class Generator:
         )
 
     def _get_string_value(self, input_ids: list[int]) -> str:
-        """
-        Get a string value from the llm based on input_ids.
+        machine = StringStateMachine()
 
-        Args:
-            input_ids (list[int]): The list of tokens / input_ids.
-        Returns:
-            str: The value gaved by the llm.
-        """
-        val_str = ""
+        machine.transition('"')
+
         for _ in range(40):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
+
             sorted_tokens = sorted(
-                range(len(logits)), key=lambda k: logits[k], reverse=True
+                range(len(logits)),
+                key=lambda k: logits[k],
+                reverse=True,
             )
 
             best_token = None
-            decoded = ""
+
             for token_id in sorted_tokens[:150]:
                 decoded = self._tokenizer.decode([token_id])
-                if decoded:
+
+                print(decoded)
+                if machine.can_accept(decoded):
                     best_token = token_id
                     break
 
             if best_token is None:
                 break
 
-            if any(stop in decoded for stop in ['"', "\n"]):
-                clean_part = decoded
-                for stop in ['"', "\n"]:
-                    clean_part = clean_part.split(stop)[0]
-                val_str += clean_part
-                break
+            decoded = self._tokenizer.decode([best_token])
 
-            val_str += decoded
+            machine.transition(decoded)
             input_ids.append(best_token)
 
-        return val_str.strip()
+            if machine.is_finished():
+                break
+
+        if not machine.is_finished():
+            return ""
+
+        return machine.value
 
     def get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
         """

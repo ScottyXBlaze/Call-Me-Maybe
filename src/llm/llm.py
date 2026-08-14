@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 19:37:36 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:50:46 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -127,6 +127,7 @@ Rules:
 - If a value is not provided, use null.
 - Return only valid JSON.
 - Use the argument names as JSON keys.
+- finish with '"' for string parameters.
 
 Request:
 "{prompt.prompt}"

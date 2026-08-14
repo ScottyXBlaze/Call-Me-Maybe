@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/14 20:25:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 20:45:41 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:50:01 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -29,10 +29,7 @@ class NumberStateMachine:
 
     def can_accept(self, char: str) -> bool:
         if self.state == State.START:
-            return (
-                char.strip() in ("-", "+")
-                or char.strip().isdigit()
-            )
+            return char.strip() in ("-", "+") or char.strip().isdigit()
 
         if self.state == State.SIGN:
             return char.isdigit()

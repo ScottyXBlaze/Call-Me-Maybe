@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 00:06:15 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:10:22 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -35,11 +35,10 @@ class Home:
         console = Console()
         console.clear()
         console.print(f"{self.title}", style="blue")
-        console.print("[magenta bold]Tips: Type 'q' to exit[/magenta bold]")
         console.print("\nParameters:", style="red bold underline")
         console.print(
             *[
-                f"    - [bold blue]{p[2:].center(20).capitalize()}[/bold blue]: {v}"
+                f"    - [bold blue]{p[2:].center(25)}[/bold blue]: {v}"
                 for p, v in arguments.items()
             ],
             sep="\n",
@@ -48,10 +47,11 @@ class Home:
         for index, model in enumerate(self.models, start=1):
             console.print(f"    {index}: [yellow]{model}[/yellow]")
         console.print()
+        console.print("[magenta bold]Type 'q' to abord[/magenta bold]")
         while True:
             value = readkey()
             if value.lower() == "q":
-                console.print("Exiting...", style="blue")
+                console.print("Exiting...", style="bold blue")
                 sys.exit()
             if not value.isnumeric():
                 continue
