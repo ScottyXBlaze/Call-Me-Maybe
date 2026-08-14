@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 15:49:53 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/14 19:15:21 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -65,4 +65,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        ...

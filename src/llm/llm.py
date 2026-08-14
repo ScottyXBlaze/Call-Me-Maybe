@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 15:44:46 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/14 19:37:36 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -108,14 +108,30 @@ Function: """
         signature = self.get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
-        signature_txt = [f"{k}: {v}" for k, v in signature.items()]
-        base_prompt = f"""
-Task: Fill the parameters values for {func_name} based on the request.
+        signature_txt = "\n".join(
+            f"{i}. {name}: {type_}"
+            for i, (name, type_) in enumerate(signature.items(), start=1)
+        )
 
-Request: "{prompt.prompt}"
-Function: {func_name}({", ".join(signature_txt)})
+        base_prompt = f"""Extract function arguments from the request.
 
-Parameters in JSON format:
+Function: {func_name}
+
+Arguments:
+{signature_txt}
+
+Rules:
+- Copy values directly from the request.
+- Do not calculate or infer values.
+- Do not invent values.
+- If a value is not provided, use null.
+- Return only valid JSON.
+- Use the argument names as JSON keys.
+
+Request:
+"{prompt.prompt}"
+
+JSON:
 """
         buffer = "{\n"
         result = {}
