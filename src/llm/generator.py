@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 16:17:01 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:03:15 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,6 +14,7 @@
 
 from typing import Any
 
+from .statemachine import IntegerStateMachine, NumberStateMachine
 from .tokenizer import Tokenizer
 
 
@@ -33,92 +34,77 @@ class Generator:
         )
 
     def _get_integer_value(self, input_ids: list[int]) -> int:
-        """
-        Get an integer value from the llm based on input_ids.
+        machine = IntegerStateMachine()
 
-        Args:
-            input_ids (list[int]): The list of tokens / input_ids.
-        Returns:
-            int: The value gaved by the llm.
-        """
-        val_str = ""
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
+
             sorted_tokens = sorted(
-                range(len(logits)), key=lambda k: logits[k], reverse=True
+                range(len(logits)),
+                key=lambda k: logits[k],
+                reverse=True,
             )
 
             best_token = None
-            for token_id in sorted_tokens[:150]:
+
+            for token_id in sorted_tokens[:100]:
                 decoded = self._tokenizer.decode([token_id])
-                if decoded and (
-                    all(c in "0123456789-" for c in decoded)
-                    or decoded in [",", "\n", " ", "}", '"']
-                ):
+                if decoded in [",", "}", "\n", '"'] and machine.is_finished():
+                    break
+                if machine.can_accept(decoded):
                     best_token = token_id
                     break
 
             if best_token is None:
                 break
 
-            decoded_str = self._tokenizer.decode([best_token])
-            if decoded_str in [",", "\n", " ", "}", '"']:
-                break
-
-            val_str += decoded_str
+            decoded = self._tokenizer.decode([best_token])
+            machine.transition(decoded)
             input_ids.append(best_token)
 
-        clean_val = val_str.strip()
-        if not clean_val:
+        if not machine.is_finished():
             return 0
 
         try:
-            return int(clean_val)
+            return int(machine.value)
         except ValueError:
             return 0
 
-    def _get_number_value(self, input_ids: list[int]) -> float:
-        """
-        Get a float or double value from the llm based on input_ids.
 
-        Args:
-            input_ids (list[int]): The list of tokens / input_ids.
-        Returns:
-            float: The value gaved by the llm.
-        """
-        val_str = ""
+    def _get_number_value(self, input_ids: list[int]) -> float:
+        machine = NumberStateMachine()
+
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
+
             sorted_tokens = sorted(
-                range(len(logits)), key=lambda k: logits[k], reverse=True
+                range(len(logits)),
+                key=lambda k: logits[k],
+                reverse=True,
             )
 
             best_token = None
-            for token_id in sorted_tokens[:150]:
+
+            for token_id in sorted_tokens[:100]:
                 decoded = self._tokenizer.decode([token_id])
-                if decoded and (
-                    all(c in "0123456789.-" for c in decoded)
-                    or decoded in [",", "\n", " ", "}", '"']
-                ):
+                if decoded in [",", "}", "\n", '"'] and machine.is_finished():
+                    break
+                if machine.can_accept(decoded):
                     best_token = token_id
                     break
 
             if best_token is None:
                 break
 
-            decoded_str = self._tokenizer.decode([best_token])
-            if decoded_str in [",", "\n", " ", "}", '"']:
-                break
-
-            val_str += decoded_str
+            decoded = self._tokenizer.decode([best_token])
+            machine.transition(decoded)
             input_ids.append(best_token)
 
-        clean_val = val_str.strip()
-        if not clean_val:
+        if not machine.is_finished():
             return 0
 
         try:
-            return float(clean_val)
+            return float(machine.value)
         except ValueError:
             return 0
 

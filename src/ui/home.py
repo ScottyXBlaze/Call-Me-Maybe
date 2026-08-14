@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 15:17:21 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 00:06:15 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -31,12 +31,20 @@ class Home:
         """
         self.models = models
 
-    def get_model_name(self) -> str:
+    def get_model_name(self, arguments: dict[str, str]) -> str:
         console = Console()
         console.clear()
         console.print(f"{self.title}", style="blue")
         console.print("[magenta bold]Tips: Type 'q' to exit[/magenta bold]")
-        console.print("Choose your llm:\n", style="bold")
+        console.print("\nParameters:", style="red bold underline")
+        console.print(
+            *[
+                f"    - [bold blue]{p[2:].center(20).capitalize()}[/bold blue]: {v}"
+                for p, v in arguments.items()
+            ],
+            sep="\n",
+        )
+        console.print("\nChoose your llm:\n", style="bold")
         for index, model in enumerate(self.models, start=1):
             console.print(f"    {index}: [yellow]{model}[/yellow]")
         console.print()
@@ -49,7 +57,9 @@ class Home:
                 continue
             value = int(value)
             if len(self.models) >= value:
-                console.print(f"[green]Choosing {self.models[value - 1]}...[/green]")
+                console.print(
+                    f"[green]Choosing {self.models[value - 1]}...[/green]"
+                )
                 break
             else:
                 console.print("[red bold]Error: Invalid input[/red bold]")
@@ -59,6 +69,5 @@ class Home:
 if __name__ == "__main__":
     try:
         home = Home(["Qwen/Qwen3-0.6B", "HuggingFaceTB/SmolLM2-360M-Instruct"])
-        home.get_model_name()
     except KeyboardInterrupt:
         ...
