@@ -6,12 +6,13 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 16:30:25 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/14 15:44:46 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """Module that contains the main file for the llm."""
 
+from collections.abc import Generator as Gen
 from typing import Any
 
 from ..model import FunctionCallResult, FunctionDefinition, Prompt
@@ -28,7 +29,10 @@ class MyLLM:
     """
 
     def __init__(
-        self, func_defs: list[FunctionDefinition], prompts: list[Prompt]
+        self,
+        func_defs: list[FunctionDefinition],
+        prompts: list[Prompt],
+        model: str,
     ) -> None:
         """
         Everything starts here.
@@ -37,8 +41,9 @@ class MyLLM:
             func_defs (list[FunctionDefinition]): The list of function
             definitions.
             prompts (list[Prompt]): The list of prompts.
+            models (str): Model to use.
         """
-        self._tokenizer = Tokenizer()
+        self._tokenizer = Tokenizer(model)
         self._func_defs = func_defs
         self._prompts = prompts
         self._func_desc = [
@@ -85,7 +90,6 @@ Function: """
         decoded_name = self._tokenizer.generate_from_tokens(
             tmp_prompt, func_name_token
         )
-        print(decoded_name)
         return {"name": decoded_name}
 
     def generate_func_args(
@@ -109,9 +113,9 @@ Function: """
 Task: Fill the parameters values for {func_name} based on the request.
 
 Request: "{prompt.prompt}"
-Function name and signature: {func_name}({", ".join(signature_txt)})
+Function: {func_name}({", ".join(signature_txt)})
 
-Parameter in JSON format:
+Parameters in JSON format:
 """
         buffer = "{\n"
         result = {}
@@ -126,7 +130,7 @@ Parameter in JSON format:
 
             buffer += prefix
             current_prompt = base_prompt + buffer
-            value = self._argument_generator.get_arg_value(
+            value = self.get_arg_value(
                 current_prompt, param_name, parameter_type
             )
             result[param_name] = value
@@ -160,6 +164,26 @@ Parameter in JSON format:
         result.update(self.generate_func_name(prompt, func_name_tokens))
         result.update(self.generate_func_args(prompt, result["name"]))
         return FunctionCallResult.model_validate(result)
+
+    def get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
+        """
+        Generate a value of a parameters based on the prompt and type.
+
+        Args:
+            prompt (str): The initial prompt to give to the llm.
+            param_name (str): The name of the parameter to generate.
+            p_type (str): The type of the parameter.
+        Returns:
+            Any: The value gaved by the llm.
+        """
+        input_ids = self._tokenizer.encode(prompt)
+        if p_type == "number":
+            return self._argument_generator._get_number_value(input_ids)
+        elif p_type == "integer":
+            return self._argument_generator._get_integer_value(input_ids)
+        elif p_type == "boolean":
+            return self._argument_generator._get_bool_value(input_ids)
+        return self._argument_generator._get_string_value(input_ids)
 
     def get_func_signature(self, func_name: str) -> dict[str, Any]:
         """
@@ -202,7 +226,7 @@ Best match: """
         )
         return decoded_name
 
-    def run(self) -> list[FunctionCallResult]:
+    def run(self) -> Gen[FunctionCallResult, None, list[FunctionCallResult]]:
         """
         Run the generation of the function call.
 
@@ -215,5 +239,6 @@ Best match: """
             func_tokens += self._tokenizer.get_token(func.name)
         for prompt in self._prompts:
             func_call = self.generate_func_call(prompt, func_tokens)
+            yield func_call
             result.append(func_call)
         return result

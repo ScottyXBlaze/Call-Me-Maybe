@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 16:37:39 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/14 15:19:58 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -20,9 +20,9 @@ from llm_sdk import Small_LLM_Model
 class Tokenizer:
     """Contain the basics of tokenization and detokenization."""
 
-    def __init__(self) -> None:
+    def __init__(self, model: str) -> None:
         """Everything starts here."""
-        self._model = Small_LLM_Model("HuggingFaceTB/SmolLM2-360M-Instruct")
+        self._model = Small_LLM_Model(model)
 
     def get_tokens(self, strings: list[str]) -> list[list[int]]:
         """
