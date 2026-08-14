@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 15:14:04 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/14 15:17:21 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -35,17 +35,17 @@ class Home:
         console = Console()
         console.clear()
         console.print(f"{self.title}", style="blue")
+        console.print("[magenta bold]Tips: Type 'q' to exit[/magenta bold]")
         console.print("Choose your llm:\n", style="bold")
         for index, model in enumerate(self.models, start=1):
             console.print(f"    {index}: [yellow]{model}[/yellow]")
+        console.print()
         while True:
-            console.print()
             value = readkey()
             if value.lower() == "q":
                 console.print("Exiting...", style="blue")
                 sys.exit()
             if not value.isnumeric():
-                console.print("[red]Error: Invalid input[/red]")
                 continue
             value = int(value)
             if len(self.models) >= value:
