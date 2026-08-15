@@ -6,9 +6,11 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 00:10:22 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:00:09 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
+
+"""Module that contains the Home UI class for the program."""
 
 import sys
 
@@ -17,21 +19,46 @@ from rich.console import Console
 
 
 class Home:
+    """Base UI class for the Home and generation process."""
+
     def __init__(self, models: list[str]) -> None:
+        """
+        Everything starts here.
+
+        Args:
+            models (list[str]): The list of model to choose.
+        """
         self.title = """
-  ░██████             ░██ ░██    ░███     ░███               ░███     ░███                       ░██                   
- ░██   ░██            ░██ ░██    ░████   ░████               ░████   ░████                       ░██                   
-░██         ░██████   ░██ ░██    ░██░██ ░██░██  ░███████     ░██░██ ░██░██  ░██████   ░██    ░██ ░████████   ░███████  
-░██              ░██  ░██ ░██    ░██ ░████ ░██ ░██    ░██    ░██ ░████ ░██       ░██  ░██    ░██ ░██    ░██ ░██    ░██ 
-░██         ░███████  ░██ ░██    ░██  ░██  ░██ ░█████████    ░██  ░██  ░██  ░███████  ░██    ░██ ░██    ░██ ░█████████ 
- ░██   ░██ ░██   ░██  ░██ ░██    ░██       ░██ ░██           ░██       ░██ ░██   ░██  ░██   ░███ ░███   ░██ ░██        
-  ░██████   ░█████░██ ░██ ░██    ░██       ░██  ░███████     ░██       ░██  ░█████░██  ░█████░██ ░██░█████   ░███████  
-                                                                                             ░██                       
-                                                                                       ░███████                        
+  ░██████             ░██ ░██    ░███     ░███               \
+░███     ░███                       ░██                   .
+ ░██   ░██            ░██ ░██    ░████   ░████               \
+░████   ░████                       ░██                   .
+░██         ░██████   ░██ ░██    ░██░██ ░██░██  ░███████     \
+░██░██ ░██░██  ░██████   ░██    ░██ ░████████   ░███████  .
+░██              ░██  ░██ ░██    ░██ ░████ ░██ ░██    ░██    \
+░██ ░████ ░██       ░██  ░██    ░██ ░██    ░██ ░██    ░██ .
+░██         ░███████  ░██ ░██    ░██  ░██  ░██ ░█████████    \
+░██  ░██  ░██  ░███████  ░██    ░██ ░██    ░██ ░█████████ .
+ ░██   ░██ ░██   ░██  ░██ ░██    ░██       ░██ ░██           \
+░██       ░██ ░██   ░██  ░██   ░███ ░███   ░██ ░██        .
+  ░██████   ░█████░██ ░██ ░██    ░██       ░██  ░███████     \
+░██       ░██  ░█████░██  ░█████░██ ░██░█████   ░███████  .
+                                                             \
+                                ░██                       .
+                                                             \
+                          ░███████                        .
         """
         self.models = models
 
     def get_model_name(self, arguments: dict[str, str]) -> str:
+        """
+        Get the model name.
+
+        Args:
+            arguments (dict[str, str]): The list of arguments.
+        Returns:
+            str: The name of the model.
+        """
         console = Console()
         console.clear()
         console.print(f"{self.title}", style="blue")
@@ -55,15 +82,16 @@ class Home:
                 sys.exit()
             if not value.isnumeric():
                 continue
-            value = int(value)
-            if len(self.models) >= value:
+            casted_value = int(value)
+            if len(self.models) >= casted_value:
                 console.print(
-                    f"[green]Choosing {self.models[value - 1]}...[/green]"
+                    f"[green]Choosing {self.models[casted_value - 1]}",
+                    "...[/green]",
                 )
                 break
             else:
                 console.print("[red bold]Error: Invalid input[/red bold]")
-        return self.models[value - 1]
+        return self.models[casted_value - 1]
 
 
 if __name__ == "__main__":
