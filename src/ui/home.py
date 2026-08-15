@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:00:09 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:05:10 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -85,8 +85,8 @@ class Home:
             casted_value = int(value)
             if len(self.models) >= casted_value:
                 console.print(
-                    f"[green]Choosing {self.models[casted_value - 1]}",
-                    "...[/green]",
+                    f"""[green]Choosing {self.models[casted_value - 1]}\
+...[/green]""",
                 )
                 break
             else:

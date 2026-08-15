@@ -1,11 +1,12 @@
 UV = uv
-CACHE = $(shell find . -name ".mypy_cache" -o -name "__pycache__")
 DIR = src
 
 C_RESET		= \033[0m
 C_GREEN		= \033[032m
 C_BLUE		= \033[034m
 C_MAGENTA	= \033[035m
+
+CACHE = $(shell find . -name ".mypy_cache" -o -name "__pycache__")
 
 install:
 	@echo "$(C_BLUE)Installing depedencies...$(C_RESET)"
@@ -42,5 +43,3 @@ lint-strict:
 	@$(UV) run mypy $(DIR) --strict
 	@echo "$(C_MAGENTA)mypy is good$(C_RESET)"
 	@echo "$(C_GREEN)Lint check successfull$(C_RESET)"
-
-
