@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 00:50:46 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:35:17 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -32,7 +32,7 @@ class MyLLM:
         self,
         func_defs: list[FunctionDefinition],
         prompts: list[Prompt],
-        model: str,
+        model: str = "Qwen/Qwen3-0.6B",
     ) -> None:
         """
         Everything starts here.

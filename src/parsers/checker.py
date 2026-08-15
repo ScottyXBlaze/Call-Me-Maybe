@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:40:50 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:31:52 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -42,6 +42,10 @@ class Checker:
         i = 0
         while i < len(args):
             flag = args[i]
+            if flag == "--bonus":
+                self._arguments[flag] = "true"
+                i += 1
+                continue
             if flag not in self._arguments:
                 raise ArgumentError(f"Parameter {flag} is invalid.")
             elif i + 1 >= len(args):

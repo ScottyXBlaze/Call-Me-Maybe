@@ -17,6 +17,10 @@ run:
 	@echo "$(C_BLUE)Running the program...$(C_RESET)"
 	@$(UV) run python3 -m $(DIR)
 
+run_bonus:
+	@echo "$(C_BLUE)Running the program with bonus...$(C_RESET)"
+	@$(UV) run python3 -m $(DIR) --bonus
+
 debug:
 	@echo "$(C_BLUE)Debugging the program...$(C_RESET)"
 	@$(UV) run python3 -m pdb -m $(DIR)

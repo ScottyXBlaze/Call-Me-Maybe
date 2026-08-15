@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:14:55 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:51:28 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -17,9 +17,10 @@ import sys
 
 from pydantic import ValidationError
 from rich.console import Console
+from rich.progress import track
 
 from .llm import MyLLM
-from .model import FunctionDefinition, Prompt
+from .model import FunctionCallResult, FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 from .ui import Home
 
@@ -39,6 +40,8 @@ class Main:
 
         self.ui = Home(self.model_list)
         self.console = Console()
+
+        self.arguments = self.get_args()
 
     def get_args(self) -> dict[str, str]:
         """
@@ -83,9 +86,15 @@ class Main:
 
     def run(self) -> None:
         """Run the program."""
-        arguments = self.get_args()
-        func_defs, prompts = self.load_args(arguments)
-        model = self.ui.get_model_name(arguments)
+        if self.arguments.get("--bonus"):
+            self.run_bonus()
+        else:
+            self.run_nornal()
+
+    def run_bonus(self) -> None:
+        """Run the bonus program."""
+        func_defs, prompts = self.load_args(self.arguments)
+        model = self.ui.get_model_name(self.arguments)
         llm = MyLLM(func_defs, prompts, model)
         llm_func_calls = llm.run()
         try:
@@ -95,7 +104,27 @@ class Main:
                 )
         except StopIteration as e:
             result = e.value
-        self.saver.save_function_calls(result, arguments["--output"])
+        self.saver.save_function_calls(result, self.arguments["--output"])
+
+    def run_nornal(self) -> None:
+        """Run the normal program."""
+        func_defs, prompts = self.load_args(self.arguments)
+        llm = MyLLM(func_defs, prompts)
+        llm_func_calls = llm.run()
+        result: list[FunctionCallResult] = []
+        try:
+            for i in track(
+                range(len(prompts)),
+                "Generating the function call...",
+                console=self.console,
+            ):
+                self.console.print(
+                    next(llm_func_calls).prompt.center(79),
+                    "[bold green]DONE![/bold green]",
+                )
+        except StopIteration as e:
+            result = e.value
+        self.saver.save_function_calls(result, self.arguments["--output"])
 
 
 if __name__ == "__main__":
