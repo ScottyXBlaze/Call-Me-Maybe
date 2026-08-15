@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:51:28 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 10:53:24 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,12 +14,18 @@
 
 import json
 import sys
+import time
 
 from pydantic import ValidationError
 from rich.console import Console
-from rich.progress import track
+from rich.progress import (
+    BarColumn,
+    Progress,
+    TaskProgressColumn,
+    TextColumn,
+)
 
-from .llm import MyLLM
+from .llm import CustomLLM
 from .model import FunctionCallResult, FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 from .ui import Home
@@ -95,7 +101,7 @@ class Main:
         """Run the bonus program."""
         func_defs, prompts = self.load_args(self.arguments)
         model = self.ui.get_model_name(self.arguments)
-        llm = MyLLM(func_defs, prompts, model)
+        llm = CustomLLM(func_defs, prompts, model)
         llm_func_calls = llm.run()
         try:
             while True:
@@ -109,21 +115,48 @@ class Main:
     def run_nornal(self) -> None:
         """Run the normal program."""
         func_defs, prompts = self.load_args(self.arguments)
-        llm = MyLLM(func_defs, prompts)
+        llm = CustomLLM(func_defs, prompts)
         llm_func_calls = llm.run()
         result: list[FunctionCallResult] = []
+        total = 0.0
         try:
-            for i in track(
-                range(len(prompts)),
-                "Generating the function call...",
-                console=self.console,
-            ):
-                self.console.print(
-                    next(llm_func_calls).prompt.center(79),
-                    "[bold green]DONE![/bold green]",
+            self.console.clear()
+            self.ui.print_header()
+            with Progress(
+                TextColumn("[magenta]Generating..."),
+                BarColumn(),
+                TaskProgressColumn(),
+            ) as progress:
+                task = progress.add_task(
+                    "Generating...",
+                    total=len(prompts),
                 )
+
+                while True:
+                    try:
+                        start = time.perf_counter()
+                        item = next(llm_func_calls)
+                        done = time.perf_counter() - start
+                        total += done
+                    except StopIteration as e:
+                        result = e.value
+                        break
+
+                    progress.console.print(
+                        f"[bold green]DONE! ({done:05.2f}s)\
+[/bold green] {item.prompt}"
+                    )
+
+                    progress.update(task, advance=1)
+
         except StopIteration as e:
             result = e.value
+        self.console.print(
+            f"\nGeneration done in {total:.2f} second\n", style="bold green"
+        )
+        self.console.print(
+            f"Saving the function call in {self.arguments['--output']}"
+        )
         self.saver.save_function_calls(result, self.arguments["--output"])
 
 

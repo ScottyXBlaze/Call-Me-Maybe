@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 01:00:26 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 11:15:39 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -53,8 +53,9 @@ class Generator:
 
             for token_id in sorted_tokens[:100]:
                 decoded = self._tokenizer.decode([token_id])
-                if decoded in [",", "}", "\n", '"'] and machine.is_finished():
-                    break
+                for char in decoded:
+                    if char in [",", "}", "\n", '"'] and machine.is_finished():
+                        break
                 if machine.can_accept(decoded):
                     best_token = token_id
                     break

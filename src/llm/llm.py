@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:35:17 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 11:13:28 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -20,7 +20,7 @@ from .generator import Generator
 from .tokenizer import Tokenizer
 
 
-class MyLLM:
+class CustomLLM:
     """
     The Base class for the LLM.
 

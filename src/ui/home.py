@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:05:10 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 10:32:47 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -49,6 +49,7 @@ class Home:
                           ░███████                        .
         """
         self.models = models
+        self.console = Console()
 
     def get_model_name(self, arguments: dict[str, str]) -> str:
         """
@@ -59,39 +60,42 @@ class Home:
         Returns:
             str: The name of the model.
         """
-        console = Console()
-        console.clear()
-        console.print(f"{self.title}", style="blue")
-        console.print("\nParameters:", style="red bold underline")
-        console.print(
+        self.console.clear()
+        self.print_header()
+        self.console.print("\nParameters:", style="red bold underline")
+        self.console.print(
             *[
                 f"    - [bold blue]{p[2:].center(25)}[/bold blue]: {v}"
                 for p, v in arguments.items()
             ],
             sep="\n",
         )
-        console.print("\nChoose your llm:\n", style="bold")
+        self.console.print("\nChoose your llm:\n", style="bold")
         for index, model in enumerate(self.models, start=1):
-            console.print(f"    {index}: [yellow]{model}[/yellow]")
-        console.print()
-        console.print("[magenta bold]Type 'q' to abord[/magenta bold]")
+            self.console.print(f"    {index}: [yellow]{model}[/yellow]")
+        self.console.print()
+        self.console.print("[magenta bold]Type 'q' to abord[/magenta bold]")
         while True:
             value = readkey()
             if value.lower() == "q":
-                console.print("Exiting...", style="bold blue")
+                self.console.print("Exiting...", style="bold blue")
                 sys.exit()
             if not value.isnumeric():
                 continue
             casted_value = int(value)
             if len(self.models) >= casted_value:
-                console.print(
+                self.console.print(
                     f"""[green]Choosing {self.models[casted_value - 1]}\
 ...[/green]""",
                 )
                 break
             else:
-                console.print("[red bold]Error: Invalid input[/red bold]")
+                self.console.print("[red bold]Error: Invalid input[/red bold]")
         return self.models[casted_value - 1]
+
+    def print_header(self) -> None:
+        """Print the header of the program."""
+        self.console.print(f"{self.title}", style="blue")
 
 
 if __name__ == "__main__":
