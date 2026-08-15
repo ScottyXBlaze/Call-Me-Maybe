@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/14 20:25:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 08:19:44 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 11:45:20 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -40,6 +40,50 @@ class NumberStateMachine(StateMachine):
         """Everything start here."""
         self.state = State.START
         self.value = ""
+        self._delimiters = {",", "}", "\n", '"'}
+
+    def _next_state(self, state: State | None, char: str) -> State | None:
+        if state == State.START:
+            if char.isspace():
+                return State.START
+            if char in ("-", "+"):
+                return State.SIGN
+            if char.isdigit():
+                return State.INTEGER
+            return None
+
+        if state == State.SIGN:
+            if char.isdigit():
+                return State.INTEGER
+            return None
+
+        if state == State.INTEGER:
+            if char.isdigit():
+                return State.INTEGER
+            if char == ".":
+                return State.DOT
+            if char in self._delimiters:
+                return State.END
+            return None
+
+        if state == State.DOT:
+            if char.isdigit():
+                return State.DECIMAL
+            return None
+
+        if state == State.DECIMAL:
+            if char.isdigit():
+                return State.DECIMAL
+            if char in self._delimiters:
+                return State.END
+            return None
+
+        if state == State.END:
+            if char.isspace():
+                return State.END
+            return None
+
+        return None
 
     def can_accept(self, char: str) -> bool:
         """
@@ -50,22 +94,12 @@ class NumberStateMachine(StateMachine):
         Returns:
             bool: True if it's valid.
         """
-        if self.state == State.START:
-            return char.strip() in ("-", "+") or char.strip().isdigit()
-
-        if self.state == State.SIGN:
-            return char.isdigit()
-
-        if self.state == State.INTEGER:
-            return char.isdigit() or char == "."
-
-        if self.state == State.DOT:
-            return char.isdigit()
-
-        if self.state == State.DECIMAL:
-            return char.isdigit()
-
-        return False
+        state: State | None = self.state
+        for current in char:
+            state = self._next_state(state, current)
+            if state is None:
+                return False
+        return True
 
     def transition(self, char: str) -> bool:
         """
@@ -76,23 +110,24 @@ class NumberStateMachine(StateMachine):
         Returns:
             bool: True if it was successfull.
         """
-        if not self.can_accept(char):
-            return False
+        for current in char:
+            next_state = self._next_state(self.state, current)
+            if next_state is None:
+                return False
 
-        self.value += char
+            if (
+                next_state
+                in (
+                    State.SIGN,
+                    State.INTEGER,
+                    State.DOT,
+                    State.DECIMAL,
+                )
+                and not current.isspace()
+            ):
+                self.value += current
 
-        if self.state == State.START:
-            self.state = State.SIGN if char == "-" else State.INTEGER
-
-        elif self.state == State.SIGN:
-            self.state = State.INTEGER
-
-        elif self.state == State.INTEGER and char == ".":
-            self.state = State.DOT
-
-        elif self.state == State.DOT:
-            self.state = State.DECIMAL
-
+            self.state = next_state
         return True
 
     def is_finished(self) -> bool:
@@ -102,4 +137,4 @@ class NumberStateMachine(StateMachine):
         Returns:
             bool: True if so.
         """
-        return self.state in (State.INTEGER, State.DECIMAL)
+        return self.state in (State.INTEGER, State.DECIMAL, State.END)

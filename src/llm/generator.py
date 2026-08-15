@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 11:15:39 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 11:35:23 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -39,6 +39,7 @@ class Generator:
 
     def _get_integer_value(self, input_ids: list[int]) -> int:
         machine = IntegerStateMachine()
+        delimiters = {",", "}", "\n", '"'}
 
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
@@ -53,9 +54,6 @@ class Generator:
 
             for token_id in sorted_tokens[:100]:
                 decoded = self._tokenizer.decode([token_id])
-                for char in decoded:
-                    if char in [",", "}", "\n", '"'] and machine.is_finished():
-                        break
                 if machine.can_accept(decoded):
                     best_token = token_id
                     break
@@ -66,6 +64,8 @@ class Generator:
             decoded = self._tokenizer.decode([best_token])
             machine.transition(decoded)
             input_ids.append(best_token)
+            if any(char in delimiters for char in decoded):
+                break
 
         if not machine.is_finished():
             return 0
@@ -77,6 +77,7 @@ class Generator:
 
     def _get_number_value(self, input_ids: list[int]) -> float:
         machine = NumberStateMachine()
+        delimiters = {",", "}", "\n", '"'}
 
         for _ in range(12):
             logits = self._tokenizer.get_logits_from_input_ids(input_ids)
@@ -91,8 +92,6 @@ class Generator:
 
             for token_id in sorted_tokens[:100]:
                 decoded = self._tokenizer.decode([token_id])
-                if decoded in [",", "}", "\n", '"'] and machine.is_finished():
-                    break
                 if machine.can_accept(decoded):
                     best_token = token_id
                     break
@@ -103,6 +102,8 @@ class Generator:
             decoded = self._tokenizer.decode([best_token])
             machine.transition(decoded)
             input_ids.append(best_token)
+            if any(char in delimiters for char in decoded):
+                break
 
         if not machine.is_finished():
             return 0
