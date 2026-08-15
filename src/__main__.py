@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 07:56:49 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 09:14:55 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -18,11 +18,10 @@ import sys
 from pydantic import ValidationError
 from rich.console import Console
 
-from src.ui.home import Home
-
 from .llm import MyLLM
 from .model import FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
+from .ui import Home
 
 
 class Main:
