@@ -1,12 +1,12 @@
 # *************************************************************************** #
 #                                                                             #
 #                                                        :::      ::::::::    #
-#    llm.py                                            :+:      :+:    :+:    #
+#    custom_llm.py                                     :+:      :+:    :+:    #
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 11:13:28 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 14:13:27 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -58,7 +58,7 @@ class CustomLLM:
             "integer": self._tokenizer.get_token("integer"),
         }
 
-    def generate_func_name(
+    def _generate_func_name(
         self, prompt: Prompt, func_name_token: list[list[int]]
     ) -> dict[str, str]:
         """
@@ -92,7 +92,7 @@ Function: """
         )
         return {"name": decoded_name}
 
-    def generate_func_args(
+    def _generate_func_args(
         self, prompt: Prompt, func_name: str
     ) -> dict[str, Any]:
         """
@@ -105,7 +105,7 @@ Function: """
             dict: A dictionnary that contains the function
             arguments with it's key.
         """
-        signature = self.get_func_signature(func_name)
+        signature = self._get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
         signature_txt = "\n".join(
@@ -138,7 +138,7 @@ JSON:
         result = {}
         params_items = list(signature.items())
         for index, (param_name, param_info) in enumerate(params_items):
-            parameter_type = self.get_param_type(param_info)
+            parameter_type = self._get_param_type(param_info)
 
             if parameter_type == "string":
                 prefix = f'    "{param_name}": "'
@@ -147,7 +147,7 @@ JSON:
 
             buffer += prefix
             current_prompt = base_prompt + buffer
-            value = self.get_arg_value(
+            value = self._get_arg_value(
                 current_prompt, param_name, parameter_type
             )
             result[param_name] = value
@@ -165,7 +165,7 @@ JSON:
 
         return {"parameters": result}
 
-    def generate_func_call(
+    def _generate_func_call(
         self, prompt: Prompt, func_name_tokens: list[list[int]]
     ) -> FunctionCallResult:
         """
@@ -178,11 +178,11 @@ JSON:
             FunctionCallResult: The function call class.
         """
         result = {"prompt": prompt.prompt}
-        result.update(self.generate_func_name(prompt, func_name_tokens))
-        result.update(self.generate_func_args(prompt, result["name"]))
+        result.update(self._generate_func_name(prompt, func_name_tokens))
+        result.update(self._generate_func_args(prompt, result["name"]))
         return FunctionCallResult.model_validate(result)
 
-    def get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
+    def _get_arg_value(self, prompt: str, param_name: str, p_type: str) -> Any:
         """
         Generate a value of a parameters based on the prompt and type.
 
@@ -202,7 +202,7 @@ JSON:
             return self._argument_generator._get_bool_value(input_ids)
         return self._argument_generator._get_string_value(input_ids)
 
-    def get_func_signature(self, func_name: str) -> dict[str, Any]:
+    def _get_func_signature(self, func_name: str) -> dict[str, Any]:
         """
         Generate the function signature based on function name.
 
@@ -220,7 +220,7 @@ JSON:
                 return value
         return {}
 
-    def get_param_type(self, p_type: str) -> str:
+    def _get_param_type(self, p_type: str) -> str:
         """
         Generate the type of parameters to match only the allowed one.
 
@@ -255,7 +255,7 @@ Best match: """
         for func in self._func_defs:
             func_tokens += self._tokenizer.get_token(func.name)
         for prompt in self._prompts:
-            func_call = self.generate_func_call(prompt, func_tokens)
+            func_call = self._generate_func_call(prompt, func_tokens)
             yield func_call
             result.append(func_call)
         return result

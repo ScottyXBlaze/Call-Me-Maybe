@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/15 00:33:18 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:00:37 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 14:12:31 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -36,7 +36,7 @@ class StringStateMachine(StateMachine):
 
     def __init__(self) -> None:
         """Everything start here."""
-        self.state = State.START
+        self._state = State.START
         self.value = ""
 
     def _next_state(self, state: State | None, char: str) -> State | None:
@@ -73,7 +73,7 @@ class StringStateMachine(StateMachine):
         Returns:
             bool: True if it's valid.
         """
-        state: State | None = self.state
+        state: State | None = self._state
 
         for a in char:
             state = self._next_state(state, a)
@@ -95,21 +95,21 @@ class StringStateMachine(StateMachine):
             bool: True if it was successfull.
         """
         for a in char:
-            if self.state == State.START:
-                self.state = State.STRING
+            if self._state == State.START:
+                self._state = State.STRING
 
-            elif self.state == State.STRING:
+            elif self._state == State.STRING:
                 if a == '"':
-                    self.state = State.END
+                    self._state = State.END
                     return True
                 elif a == "\\":
-                    self.state = State.ESCAPE
+                    self._state = State.ESCAPE
                 else:
                     self.value += a
 
-            elif self.state == State.ESCAPE:
+            elif self._state == State.ESCAPE:
                 self.value += a
-                self.state = State.STRING
+                self._state = State.STRING
         return True
 
     def is_finished(self) -> bool:
@@ -119,4 +119,4 @@ class StringStateMachine(StateMachine):
         Returns:
             bool: True if so.
         """
-        return self.state == State.END
+        return self._state == State.END

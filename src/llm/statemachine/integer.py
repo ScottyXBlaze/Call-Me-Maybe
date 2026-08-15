@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/14 20:25:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 11:45:47 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 14:12:01 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -36,7 +36,7 @@ class IntegerStateMachine(StateMachine):
 
     def __init__(self) -> None:
         """Everything start here."""
-        self.state = State.START
+        self._state = State.START
         self.value = ""
         self._delimiters = {",", "}", "\n", '"'}
 
@@ -78,7 +78,7 @@ class IntegerStateMachine(StateMachine):
         Returns:
             bool: True if it's valid.
         """
-        state: State | None = self.state
+        state: State | None = self._state
         for current in char:
             state = self._next_state(state, current)
             if state is None:
@@ -95,7 +95,7 @@ class IntegerStateMachine(StateMachine):
             bool: True if it was successfull.
         """
         for current in char:
-            next_state = self._next_state(self.state, current)
+            next_state = self._next_state(self._state, current)
             if next_state is None:
                 return False
 
@@ -105,7 +105,7 @@ class IntegerStateMachine(StateMachine):
             ):
                 self.value += current
 
-            self.state = next_state
+            self._state = next_state
         return True
 
     def is_finished(self) -> bool:
@@ -115,4 +115,4 @@ class IntegerStateMachine(StateMachine):
         Returns:
             bool: True if so.
         """
-        return self.state in (State.INTEGER, State.END)
+        return self._state in (State.INTEGER, State.END)

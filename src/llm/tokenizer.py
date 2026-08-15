@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/14 15:19:58 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/15 14:14:04 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -58,7 +58,7 @@ class Tokenizer:
 
         return result
 
-    def get_best_token(self, string: str, allowed_tokens: set[int]) -> int:
+    def _get_best_token(self, string: str, allowed_tokens: set[int]) -> int:
         """
         Get the best token based on the allowed tokens.
 
@@ -108,7 +108,7 @@ class Tokenizer:
                 break
             allowed_token = {seq[i] for seq in candidates}
             if len(allowed_token) > 1:
-                best_token = self.get_best_token(prompt, allowed_token)
+                best_token = self._get_best_token(prompt, allowed_token)
             else:
                 best_token = allowed_token.pop()
             result.append(best_token)
