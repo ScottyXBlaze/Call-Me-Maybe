@@ -21,9 +21,9 @@
 
 ## Description
 
-**Call me maybe** is a wonderful project that introduce LLM generation and constrained decoding.
+**Call me maybe** is a project that introduces LLM generation and constrained decoding.
 
-The **Goal** of this project is simple: Generate the name and parameters of the function that solve the request or prompt by using the llm and constrained decoding. So we don't rely on the llm itself but guide him to generate valid answer.
+The goal of this project is simple: generate the name and parameters of a function that solve requests or prompts by using the LLM and constrained decoding. This way we don't rely solely on the LLM but guide it to generate valid answers.
 
 An example of constrained decoding:
 
@@ -40,7 +40,7 @@ So this program will follow this constrained decoding method to generate valid d
 > [!NOTE]
 > This program will store +5 Gb in the memory, be prepared to download it and configure your settings.
 
-- To change where the UV will store his cache:
+- To change where the UV will store its cache:
 
 ```bash
 export HF_HOME="/home/$(USER)/goinfre/.cache/huggingface"
@@ -78,7 +78,7 @@ make clean
 
 ```bash
 make lint
-make lint-strinct
+make lint-strict
 ```
 
 ### Manual
@@ -95,15 +95,15 @@ uv sync
 uv run python3 -m src [–-functions_definition <function_definition_file>] [–-input <input_file>] [–-output <output_file>] [--bonus]
 ```
 
-Every parameters are optionals and has a default value.
+All parameters are optional and have default values.
 
-- **functions_definition**: The file that contains every declaration of function.
-- **input**: The file that contains every declaration or prompts.
-- **output**: The file that will store the result of the program.
+- **functions_definition**: File containing all function declarations.
+- **input**: File containing prompts or inputs.
+- **output**: File that will store the result of the program.
 - **Bonus**: Flag to run the bonus program.
 
 > [!IMPORTANT]
-> If you are launching the bonus, You will need need to choose between two model before the generation is starting
+> If you are launching the bonus, you will need to choose between two models before generation starts
 
 ## Resources
 
@@ -113,13 +113,13 @@ Every parameters are optionals and has a default value.
 
 ### AI Usage
 
-AI was used generally to explain some regular expression syntaxes and to tell me how to use the *rich* library in python. It also helps me understanding the state machine.
+AI was generally used to explain some regular expression syntax and to show how to use the *rich* library in Python. It also helped me understand the state machine.
 
 ## Extras
 
 ### Algorithm explanation
 
-Constrained decoding is a very efficient method to always output a valid value. To implement that to my project, there was two main design:
+Constrained decoding is a very efficient method to always output a valid value. To implement that in my project, there were two main design choices:
 
 - First, to generate the function name, I used a method where instead of deleting every forbidden syntax, I only check the allowed one. This is done to optimize the generation and minimize resource utilization.
 
@@ -133,12 +133,12 @@ prompt = "What is 2 multiply by 1?"
 encoded_prompt = model.encode(prompt).tolist()[0]
 func_name = ["fn_add_numbers", "fn_mult", "fn_greet"]
 
-# We transform every name in token
+# We transform every name into tokens
 func_name_tokens = [[8822, 2891, 32964], [8822, 26290], [8822, 1889, 3744]]
-# Get the logits from the llm
+# Get the logits from the LLM
 logits = model.get_logits_from_input_ids(encoded_prompt)
 
-# Instead of checking every input, we only check only what we need
+# Instead of checking every input, we only check what we need
 valid_tokens = {seq[0] for seq in func_name_tokens}
 
 best = float("-inf")
@@ -155,7 +155,7 @@ print(f"{model.decode([token_id])} is the best match for the llm with constraine
 
 ```
 
-- Second, To generate the parameters of the function, I used a finite state machine. A finite state machine or FSM is a popular concept in video games and algorithm implementation. It switch between a state and each state can do one thing at a time. This is done to make sure the LLM always generate a valid data because we tell them what they should do.
+- Second, To generate the parameters of the function, I used a finite state machine. A finite state machine or FSM is a popular concept in video games and algorithm implementation. It switch between a state and each state can do one thing at a time. This is done to make sure the LLM always generates valid data because we tell it what to do.
 
 **Example**:
 
@@ -204,34 +204,33 @@ FLOAT:
     └──  home.py
 ```
 
-I added a lot of implementation in this project. First is the State machine and selective decoding I explained above. I also added the *parsers* file that store class to make loading and saving easier (It has error handling to verify if the file is available or not before continuing) .
+I added a lot of implementation in this project. First is the state machine and selective decoding explained above. I also added the *parsers* module that stores classes to make loading and saving easier (it includes error handling to verify if a file is available before continuing).
 
-The *model* package stores every model validation for the input and output of the program. This ensure that every data is structured and scalable.
+The *model* package contains validation logic for program inputs and outputs. This ensures that data is structured and scalable.
 
-The *llm* file contains be core of the project, here belongs the class to run of the custom llm with constrained decoding, simple tokenization class and generator with 4 specific type: The number, the integer, the boolean and string. Object like array or nested function arguments was not handled and considered string by default to keep the program from scope.
+The *llm* package contains the core of the project: classes to run the custom LLM with constrained decoding, a simple tokenizer, and a generator for four specific types: number, integer, boolean, and string. Objects like arrays or nested function arguments are not handled and are treated as strings by default to keep the project scope limited.
 
 ### Performance analysis
 
-This model used **Qwen/Qwen3-0.6B** as a default llm. This model is lightweight and can be used with a normal computer. So the program is pretty fast (between 60 sec and 90 sec) to run the default prompt.
+This project uses **Qwen/Qwen3-0.6B** as the default LLM. This model is lightweight and can be used on a normal computer, so the program is fairly fast (between 60 and 90 seconds) to run the default prompt.
 
-The accuracy is based on the prompt, because the llm has no complex implementation. It rely on the best value if it is allowed, and the llm don't always understand the prompt so it can generate other value and miss the real goal. So It can be really reliable if your prompt is good, but have some challenge when it comes to complex request or blurry prompt.
+Accuracy depends on the prompt, because the LLM has no complex reasoning. It relies on the best allowed value, and the LLM doesn't always understand the prompt, so it can generate other values and miss the real goal. It can be reliable if the prompt is clear, but may struggle with complex or ambiguous requests.
 
 ### Challenges faced
 
-There was a lot of difficulty encountered with this project, The project was not clear at first and there were not a lot of subject on documentation about it. Then the peer learning helped me to know the basics and then I went on my own. On my way, I tried to implement what other people said and it was not the right approach for me, so I did my own test and found other (not always better) way to implement the logic. Then I finished with the FSM test some edge cases with my friends. There is also a problem that is not really solved because it rely on the llm which is the negative integer, the llm cannot generate it because the most probable answer is always a number.
+There were many difficulties encountered during this project. The topic was unclear at first and there was limited documentation. Peer learning helped me understand the basics, after which I explored solutions independently. I tried some community suggestions that were not suitable for my approach, so I ran my own tests and found alternative (not always better) implementations. I also tested FSM edge cases with colleagues. One remaining issue is negative integers: the LLM rarely generates them because the most probable answer tends to be a positive number.
 
 ### Testing strategy
 
-I tested my implementation by using the project own test and it worked. Then I tried with some harder one and it did fine on most of them but still fail for some complex one.
-I also tried to change function name, parameters, and description and it made most of them.
+I tested my implementation using the project's own tests and they passed. I then tried harder cases and it worked for most, but still fails on some complex inputs. I also experimented with changing function names, parameters, and descriptions, and most changes produced acceptable results.
 
 ### Example usage
 
-To run the program, First you need to have 2 file, the list of prompt as a json (see data/input/function_calling_tests.json file) and the list of function definition as a json (see data/input/functions_definition.json). You can change the value by using a flag when launching the program. These file will be loaded as a json format and will be validated by the model in *src/model/input.py* file.
+To run the program, first you need two files: a list of prompts as JSON (see data/input/function_calling_tests.json) and a list of function definitions as JSON (see data/input/functions_definition.json). You can change these values using flags when launching the program. These files will be loaded in JSON format and validated by the model in *src/model/input.py*.
 
-The program will start generating the function name and parameters using the llm. And will be saved in a json file (default in data/output/function_call_results.json)
+The program will start generating function names and parameters using the LLM, and results are saved in a JSON file (default: data/output/function_call_results.json).
 
-You can create your own prompt and function definitions by following the format bellow:
+You can create your own prompts and function definitions by following the format below:
 
 **Prompt file**:
 
