@@ -44,7 +44,7 @@ So this program will follow this constrained decoding method to generate valid d
 
 ```bash
 export HF_HOME="/home/$(USER)/goinfre/.cache/huggingface"
-export UV_CACHE_DIR="/home/nyramana/goinfre/.uv_cache"
+export UV_CACHE_DIR="/home/$(USER)/goinfre/.uv_cache"
 
 ```
 
