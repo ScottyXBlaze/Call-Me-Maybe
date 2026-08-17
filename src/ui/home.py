@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 10:32:47 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 10:06:50 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -60,16 +60,6 @@ class Home:
         Returns:
             str: The name of the model.
         """
-        self.console.clear()
-        self.print_header()
-        self.console.print("\nParameters:", style="red bold underline")
-        self.console.print(
-            *[
-                f"    - [bold blue]{p[2:].center(25)}[/bold blue]: {v}"
-                for p, v in arguments.items()
-            ],
-            sep="\n",
-        )
         self.console.print("\nChoose your llm:\n", style="bold")
         for index, model in enumerate(self.models, start=1):
             self.console.print(f"    {index}: [yellow]{model}[/yellow]")
@@ -97,9 +87,12 @@ class Home:
         """Print the header of the program."""
         self.console.print(f"{self.title}", style="blue")
 
-
-if __name__ == "__main__":
-    try:
-        home = Home(["Qwen/Qwen3-0.6B", "HuggingFaceTB/SmolLM2-360M-Instruct"])
-    except KeyboardInterrupt:
-        ...
+    def print_parameters(self, arguments: dict[str, str]) -> None:
+        self.console.print("\nParameters:", style="red bold underline")
+        self.console.print(
+            *[
+                f"    - [bold blue]{p[2:].center(25)}[/bold blue]: {v}"
+                for p, v in arguments.items()
+            ],
+            sep="\n",
+        )
