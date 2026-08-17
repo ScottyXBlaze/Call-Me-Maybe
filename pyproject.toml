@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "flake8>=7.3.0",
     "flake8-docstrings>=1.7.0",
-    "llm-sdk>=1.0.1",
+    "llm-sdk",
     "mypy>=2.3.0",
     "pydantic>=2.13.4",
     "readchar>=4.2.2",

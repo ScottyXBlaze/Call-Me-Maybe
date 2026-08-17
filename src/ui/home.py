@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 10:06:50 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 10:50:46 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -88,6 +88,12 @@ class Home:
         self.console.print(f"{self.title}", style="blue")
 
     def print_parameters(self, arguments: dict[str, str]) -> None:
+        """
+        Print the parameters of the function.
+
+        Args:
+            arguments (dict[str, str]): The parameter of the function.
+        """
         self.console.print("\nParameters:", style="red bold underline")
         self.console.print(
             *[

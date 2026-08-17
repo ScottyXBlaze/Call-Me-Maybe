@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 10:06:21 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 10:57:02 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -15,6 +15,7 @@
 import json
 import sys
 import time
+from typing import Any
 
 from pydantic import ValidationError
 from rich.console import Console
@@ -27,7 +28,7 @@ from rich.progress import (
 )
 
 from .llm import CustomLLM
-from .model import FunctionCallResult, FunctionDefinition, Prompt
+from .model import FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 from .ui import Home
 
@@ -37,20 +38,20 @@ class Main:
 
     def __init__(self) -> None:
         """Everything starts here."""
-        self.checker = Checker()
-        self.loader = Loader()
-        self.saver = Saver()
-        self.model_list = [
+        self._checker = Checker()
+        self._loader = Loader()
+        self._saver = Saver()
+        self._model_list = [
             "Qwen/Qwen3-0.6B",
             "HuggingFaceTB/SmolLM2-360M-Instruct",
         ]
 
-        self.ui = Home(self.model_list)
-        self.console = Console()
+        self._ui = Home(self._model_list)
+        self._console = Console()
 
-        self.arguments = self.get_args()
+        self._arguments = self._get_args()
 
-    def get_args(self) -> dict[str, str]:
+    def _get_args(self) -> dict[str, str]:
         """
         Get the argument of the program stored in sys.argv and validate them.
 
@@ -58,13 +59,13 @@ class Main:
             dict: The name of the flag and it's value.
         """
         try:
-            arguments = self.checker.check_args(sys.argv[1:])
+            arguments: dict[str, str] = self._checker.check_args(sys.argv[1:])
         except ArgumentError as e:
             print(f"[ERROR] {e}")
             sys.exit(1)
         return arguments
 
-    def load_args(
+    def _load_args(
         self, arguments: dict[str, str]
     ) -> tuple[list[FunctionDefinition], list[Prompt]]:
         """
@@ -76,10 +77,10 @@ class Main:
             tuple: the list of func_defs and prompts.
         """
         try:
-            func_defs: list[FunctionDefinition] = self.loader.load_func_defs(
+            func_defs: list[FunctionDefinition] = self._loader.load_func_defs(
                 arguments["--functions_definition"]
             )
-            prompts: list[Prompt] = self.loader.load_prompts(
+            prompts: list[Prompt] = self._loader.load_prompts(
                 arguments["--input"]
             )
         except json.JSONDecodeError as e:
@@ -93,36 +94,60 @@ class Main:
 
     def run(self) -> None:
         """Run the program."""
-        if self.arguments.get("--bonus"):
-            self.run_bonus()
+        self._console.clear()
+        self._ui.print_header()
+        func_defs, prompts = self._load_args(self._arguments)
+        if self._arguments.get("--bonus"):
+            model = self._ui.get_model_name(self._arguments)
+            llm = CustomLLM(func_defs, prompts, model)
         else:
-            self.run_nornal()
+            llm = CustomLLM(func_defs, prompts)
+        llm_func_calls = llm.run()
+        len_prompts = len(prompts)
+        if self._arguments.get("--bonus"):
+            self._run_bonus(llm_func_calls, len_prompts)
+        else:
+            self._run_nornal(llm_func_calls, len_prompts)
 
-    def run_bonus(self) -> None:
+    def _run_bonus(self, func_calls: Any, len_prompts: int) -> None:
         """Run the bonus program."""
-        func_defs, prompts = self.load_args(self.arguments)
-        model = self.ui.get_model_name(self.arguments)
-        llm = CustomLLM(func_defs, prompts, model)
-        llm_func_calls = llm.run()
-        try:
-            while True:
-                self.console.print_json(
-                    next(llm_func_calls).model_dump_json(), indent=4
-                )
-        except StopIteration as e:
-            result = e.value
-        self.saver.save_function_calls(result, self.arguments["--output"])
-
-    def run_nornal(self) -> None:
-        """Run the normal program."""
-        func_defs, prompts = self.load_args(self.arguments)
-        llm = CustomLLM(func_defs, prompts)
-        llm_func_calls = llm.run()
-        result: list[FunctionCallResult] = []
         total = 0.0
         try:
-            self.console.clear()
-            self.ui.print_header()
+            with Progress(
+                SpinnerColumn(),
+                BarColumn(),
+                TaskProgressColumn(),
+            ) as progress:
+                task = progress.add_task(
+                    "Generating...",
+                    total=len_prompts,
+                )
+
+                while True:
+                    try:
+                        start = time.perf_counter()
+                        item = next(func_calls)
+                        self._console.print_json(item.model_dump_json())
+                        done = time.perf_counter() - start
+                        total += done
+                    except StopIteration as e:
+                        result = e.value
+                        break
+                    progress.update(task, advance=1)
+        except StopIteration as e:
+            result = e.value
+        self._console.print(
+            f"\nGeneration done in {total:.2f} second\n", style="bold green"
+        )
+        self._console.print(
+            f"Saving the function call in {self._arguments['--output']}"
+        )
+        self._saver.save_function_calls(result, self._arguments["--output"])
+
+    def _run_nornal(self, func_calls: Any, len_prompts: int) -> None:
+        """Run the normal program."""
+        total = 0.0
+        try:
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[magenta]Generating..."),
@@ -131,13 +156,13 @@ class Main:
             ) as progress:
                 task = progress.add_task(
                     "Generating...",
-                    total=len(prompts),
+                    total=len_prompts,
                 )
 
                 while True:
                     try:
                         start = time.perf_counter()
-                        item = next(llm_func_calls)
+                        item = next(func_calls)
                         done = time.perf_counter() - start
                         total += done
                     except StopIteration as e:
@@ -153,10 +178,10 @@ class Main:
 
         except StopIteration as e:
             result = e.value
-        self.console.print(
+        self._console.print(
             f"\nGeneration done in {total:.2f} second\n", style="bold green"
         )
-        self.console.print(
-            f"Saving the function call in {self.arguments['--output']}"
+        self._console.print(
+            f"Saving the function call in {self._arguments['--output']}"
         )
-        self.saver.save_function_calls(result, self.arguments["--output"])
+        self._saver.save_function_calls(result, self._arguments["--output"])
