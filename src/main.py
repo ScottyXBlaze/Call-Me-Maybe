@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 10:57:02 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 11:21:01 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -113,27 +113,16 @@ class Main:
         """Run the bonus program."""
         total = 0.0
         try:
-            with Progress(
-                SpinnerColumn(),
-                BarColumn(),
-                TaskProgressColumn(),
-            ) as progress:
-                task = progress.add_task(
-                    "Generating...",
-                    total=len_prompts,
-                )
-
-                while True:
-                    try:
-                        start = time.perf_counter()
-                        item = next(func_calls)
-                        self._console.print_json(item.model_dump_json())
-                        done = time.perf_counter() - start
-                        total += done
-                    except StopIteration as e:
-                        result = e.value
-                        break
-                    progress.update(task, advance=1)
+            while True:
+                try:
+                    start = time.perf_counter()
+                    item = next(func_calls)
+                    self._console.print_json(item.model_dump_json())
+                    done = time.perf_counter() - start
+                    total += done
+                except StopIteration as e:
+                    result = e.value
+                    break
         except StopIteration as e:
             result = e.value
         self._console.print(
