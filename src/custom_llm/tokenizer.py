@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:56:35 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 16:30:49 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 16:35:59 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -17,7 +17,7 @@ from typing import Any
 
 try:
     from llm_sdk import Small_LLM_Model
-except Exception:
+except Exception: # noqa
     print("[ERROR] Importing llm_sdk")
     sys.exit(1)
 

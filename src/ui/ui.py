@@ -1,12 +1,12 @@
 # *************************************************************************** #
 #                                                                             #
 #                                                        :::      ::::::::    #
-#    home.py                                           :+:      :+:    :+:    #
+#    ui.py                                             :+:      :+:    :+:    #
 #                                                    +:+ +:+         +:+      #
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/13 16:35:44 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 10:50:46 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 16:42:42 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -63,8 +63,17 @@ class Home:
         self.console.print("\nChoose your llm:\n", style="bold")
         for index, model in enumerate(self.models, start=1):
             self.console.print(f"    {index}: [yellow]{model}[/yellow]")
-        self.console.print()
-        self.console.print("[magenta bold]Type 'q' to abord[/magenta bold]")
+        self.console.print("\n[magenta bold]Type 'q' to abord[/magenta bold]")
+        value = self.get_input()
+        return self.models[value - 1]
+
+    def get_input(self) -> int:
+        """
+        Get the index of the prompt name.
+
+        Returns:
+            int: The index of the model in the list.
+        """
         while True:
             value = readkey()
             if value.lower() == "q":
@@ -81,7 +90,7 @@ class Home:
                 break
             else:
                 self.console.print("[red bold]Error: Invalid input[/red bold]")
-        return self.models[casted_value - 1]
+        return casted_value
 
     def print_header(self) -> None:
         """Print the header of the program."""
