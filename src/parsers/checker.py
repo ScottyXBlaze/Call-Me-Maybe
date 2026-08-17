@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:31:52 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 16:27:28 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -50,9 +50,10 @@ class Checker:
                 raise ArgumentError(f"Parameter {flag} is invalid.")
             elif i + 1 >= len(args):
                 raise ArgumentError(f"Missing value for parameter {flag}")
-            self._validate_params(flag, args[i + 1])
             self._arguments[flag] = args[i + 1]
             i += 2
+        for k, v in self._arguments.items():
+            self._validate_params(k, v)
         return self._arguments
 
     def _validate_params(self, params: str, path: str) -> None:
@@ -63,6 +64,8 @@ class Checker:
             params (str): The flag.
             path (str): The path of the file.
         """
+        if params == "--bonus":
+            return
         if params == "--output":
             self._verify_output(path)
         self._verify_input(path)

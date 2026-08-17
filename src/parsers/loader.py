@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 13:15:18 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/13 15:39:12 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 15:42:22 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -33,7 +33,7 @@ class Loader:
         try:
             with open(path, "r") as r:
                 result = json.load(r)
-        except (json.JSONDecodeError, ValueError) as e:
+        except (json.JSONDecodeError, ValueError, OSError) as e:
             print(f"[ERROR] {e}")
             sys.exit(1)
         return [
@@ -53,7 +53,7 @@ class Loader:
         try:
             with open(path, "r") as file:
                 result = json.load(file)
-        except (json.JSONDecodeError, ValueError) as e:
+        except (json.JSONDecodeError, ValueError, OSError) as e:
             print(f"[ERROR] {e}")
             sys.exit(1)
         return [Prompt.model_validate(prompt) for prompt in result]
