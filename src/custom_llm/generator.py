@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 11:35:23 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 12:43:50 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,7 +14,7 @@
 
 from typing import Any
 
-from .statemachine import (
+from ..statemachine import (
     IntegerStateMachine,
     NumberStateMachine,
     StringStateMachine,

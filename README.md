@@ -17,6 +17,7 @@
     - [Challenges faced](#challenges-faced)
     - [Testing strategy](#testing-strategy)
     - [Example usage](#example-usage)
+  - [Bonus](#bonus)
 <!--toc:end-->
 
 ## Description
@@ -30,8 +31,8 @@ An example of constrained decoding:
 - Prompt: "reverse the word: 'you are beautiful'."
 - Answer without constrained decoding:
   - the reverse of the word 'you are beautiful' is 'lufituaeb era uoy'.
-- Answer with constrained: "answer":
-  - "lufituaeb era uoy"
+- Answer with constrained decoding:
+  - "answer": "lufituaeb era uoy"
 
 So this program will follow this constrained decoding method to generate valid data and output the value in a json file.
 
@@ -40,7 +41,7 @@ So this program will follow this constrained decoding method to generate valid d
 > [!NOTE]
 > This program will store +5 Gb in the memory, be prepared to download it and configure your settings.
 
-- To change where the UV will store its cache:
+- To change where the UV and huggingface will store its cache:
 
 ```bash
 export HF_HOME="/home/$(USER)/goinfre/.cache/huggingface"
@@ -95,7 +96,7 @@ uv sync
 uv run python3 -m src [–-functions_definition <function_definition_file>] [–-input <input_file>] [–-output <output_file>] [--bonus]
 ```
 
-All parameters are optional and have default values.
+**Explanation:**
 
 - **functions_definition**: File containing all function declarations.
 - **input**: File containing prompts or inputs.
@@ -118,6 +119,9 @@ AI was generally used to explain some regular expression syntax and to show how 
 ## Extras
 
 ### Algorithm explanation
+
+> [!NOTE]
+> We don't generate the json with the llm, just the function name and the parameter values.
 
 Constrained decoding is a very efficient method to always output a valid value. To implement that in my project, there were two main design choices:
 
@@ -171,6 +175,12 @@ FLOAT:
     DOT (.)
     DECIMAL (NUMBER)
     END ('"', ...)
+```
+
+So the main loop is:
+
+```
+Checking -> Loading -> Getting func_name -> Getting func_args with StateMachine -> Validating with pydantic -> Saving
 ```
 
 ### Design decisions
@@ -252,6 +262,7 @@ You can create your own prompts and function definitions by following the format
     "name": "...",
     "description": "...",
     "parameters": {
+        "name": "type",
         ...
         },
     "returns": {
@@ -259,3 +270,23 @@ You can create your own prompts and function definitions by following the format
         }
 }
 ```
+
+**Function Call Result**:
+
+```json
+{
+    "prompt": "...",
+    "name": "...",
+    "parameters": {
+        ...
+    }
+}
+```
+
+## Bonus
+
+Here is a list of **bonus** I implemented (Use the *--bonus* flag):
+
+- Support for multiple LLM models beyond Qwen/Qwen3-0.6B: I added "HuggingFaceTB/SmolLM2-360M-Instruct" to the program but it can support many other llm because of the constrained decoding.
+- Visualization of the generation process: I added a Visualization after a prompt is finished.
+- Demonstration of how encoding and decoding integrate with constrained decoding: See the section [below](#algorithm-explanation).

@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 11:21:01 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/17 12:43:42 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -27,7 +27,7 @@ from rich.progress import (
     TextColumn,
 )
 
-from .llm import CustomLLM
+from .custom_llm import CustomLLM
 from .model import FunctionDefinition, Prompt
 from .parsers import ArgumentError, Checker, Loader, Saver
 from .ui import Home
