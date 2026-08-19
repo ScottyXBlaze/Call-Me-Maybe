@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 12:43:42 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/19 09:54:25 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -117,7 +117,7 @@ class Main:
                 try:
                     start = time.perf_counter()
                     item = next(func_calls)
-                    self._console.print_json(item.model_dump_json())
+                    self._console.print_json(item.model_dump_json(), indent=4)
                     done = time.perf_counter() - start
                     total += done
                 except StopIteration as e:
