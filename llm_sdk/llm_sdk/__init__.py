@@ -1,22 +1,13 @@
-# *************************************************************************** #
-#                                                                             #
-#                                                        :::      ::::::::    #
-#    __init__.py                                       :+:      :+:    :+:    #
-#                                                    +:+ +:+         +:+      #
-#    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
-#                                                +#+#+#+#+#+   +#+            #
-#    Created: 2026/08/03 13:31:06 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/03 13:31:06 by nyramana        ###   ########.fr        #
-#                                                                             #
-# *************************************************************************** #
-
-
 # ABOUTME: LLM SDK for local model inference using Hugging Face transformers.
 # ABOUTME: Provides Small_LLM_Model class for loading and running causal language models.
+
+import time
+from typing import Tuple
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer, PreTrainedModel, logging
 from huggingface_hub import hf_hub_download
+import os
 
 
 logging.set_verbosity_error()  # keep the console clean
