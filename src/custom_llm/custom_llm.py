@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/19 10:02:45 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/22 09:12:58 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -103,18 +103,16 @@ Function: """
             f"{name}: {type_}" for (name, type_) in signature.items()
         )
 
-        base_prompt = f"""Extract function arguments from the request as a json.
+        base_prompt = f"""Fill the function arguments using the request.
+Infer argument values when necessary from the request.
 
-# Rules:
-- Only extract the argument logic from the request.
-
-# Function:
+Function:
 {func_name}({signature_txt})
 
-# Request:
-"{prompt.prompt}"
+Request:
+{prompt.prompt}
 
-# JSON:
+JSON:
 """
         buffer = "{\n"
         result = {}

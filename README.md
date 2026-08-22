@@ -44,8 +44,8 @@ So this program will follow this constrained decoding method to generate valid d
 - To change where the UV and huggingface will store its cache:
 
 ```bash
-export HF_HOME="/home/$(USER)/goinfre/.cache/huggingface"
-export UV_CACHE_DIR="/home/$(USER)/goinfre/.uv_cache"
+export HF_HOME="/home/${USER}/goinfre/.cache/huggingface"
+export UV_CACHE_DIR="/home/${USER}/goinfre/.uv_cache"
 
 ```
 
