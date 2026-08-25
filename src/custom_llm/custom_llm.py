@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/22 09:12:58 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 11:39:41 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -70,8 +70,8 @@ class CustomLLM:
         Returns:
             dict: A dictionnary that contains the function name with it's key.
         """
-        tmp_prompt = f"""
-Choose the exact function name from the list that best answers the prompt.
+        tmp_prompt = f"""Choose a function name \
+based based on their descriptions that answers the prompt.
 
 Functions:
 {''.join(self._func_desc)}
@@ -103,8 +103,8 @@ Function: """
             f"{name}: {type_}" for (name, type_) in signature.items()
         )
 
-        base_prompt = f"""Fill the function arguments using the request.
-Infer argument values when necessary from the request.
+        base_prompt = f"""Fill the function arguments that answers the request.
+Change argument values when necessary.
 
 Function:
 {func_name}({signature_txt})

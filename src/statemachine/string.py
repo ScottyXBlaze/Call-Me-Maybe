@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/15 00:33:18 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 14:12:31 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 11:40:26 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -40,6 +40,15 @@ class StringStateMachine(StateMachine):
         self.value = ""
 
     def _next_state(self, state: State | None, char: str) -> State | None:
+        """
+        Change the state based on the charactere.
+
+        Args:
+            state (State): The current state.
+            char (str): The current chara.
+        Returns:
+            State: Description of return value.
+        """
         if state == State.START:
             if char == '"':
                 return State.STRING

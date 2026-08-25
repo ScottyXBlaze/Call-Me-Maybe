@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/14 20:25:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 14:12:12 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 11:40:21 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -43,6 +43,15 @@ class NumberStateMachine(StateMachine):
         self._delimiters = {",", "}", "\n", '"'}
 
     def _next_state(self, state: State | None, char: str) -> State | None:
+        """
+        Change the state based on the charactere.
+
+        Args:
+            state (State): The current state.
+            char (str): The current chara.
+        Returns:
+            State: Description of return value.
+        """
         if state == State.START:
             if char.isspace():
                 return State.START
