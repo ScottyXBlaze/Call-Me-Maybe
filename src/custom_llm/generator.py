@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 12:43:50 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 22:56:27 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -38,6 +38,14 @@ class Generator:
         )
 
     def _get_integer_value(self, input_ids: list[int]) -> int:
+        """
+        Generate an Integer value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt. 
+        Returns:
+            int: The value gaved by the llm.
+        """
         machine = IntegerStateMachine()
         delimiters = {",", "}", "\n", '"'}
 
@@ -76,6 +84,14 @@ class Generator:
             return 0
 
     def _get_number_value(self, input_ids: list[int]) -> float:
+        """
+        Generate a float value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt. 
+        Returns:
+            float: The value gaved by the llm.
+        """
         machine = NumberStateMachine()
         delimiters = {",", "}", "\n", '"'}
 
@@ -133,6 +149,14 @@ class Generator:
         )
 
     def _get_string_value(self, input_ids: list[int]) -> str:
+        """
+        Generate a string value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt. 
+        Returns:
+            str: The value gaved by the llm.
+        """
         machine = StringStateMachine()
 
         machine.transition('"')
