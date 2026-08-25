@@ -111,6 +111,8 @@ uv run python3 -m src [–-functions_definition <function_definition_file>] [–
 - **Peer learning.**
 - [Constrained decoding](https://youtu.be/xpvFinvqRCA?si=y2c4_kxCeAlTdxVu)
 - [Huggingface](https://huggingface.co/)
+- [Terminal color](https://student.cs.uwaterloo.ca/~cs452/terminal.html)
+- [Python Rich library](https://www.geeksforgeeks.org/python/installing-and-using-rich-package-in-python/)
 
 ### AI Usage
 
