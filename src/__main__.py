@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/17 09:55:16 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/17 10:53:24 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 23:03:34 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -31,3 +31,6 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(f"[ERROR] {e}")
+        print("This should never happen.")
