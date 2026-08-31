@@ -36,7 +36,6 @@ lint:
 	@echo "$(C_MAGENTA)flake8 is good$(C_RESET)"
 	@echo "$(C_BLUE)Checking mypy...$(C_RESET)"
 	@$(UV) run mypy $(DIR) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-	@echo "$(C_MAGENTA)mypy is good$(C_RESET)"
 	@echo "$(C_GREEN)Lint check successfull$(C_RESET)"
 
 lint-strict:
@@ -45,5 +44,4 @@ lint-strict:
 	@echo "$(C_MAGENTA)flake8 is good$(C_RESET)"
 	@echo "$(C_BLUE)Checking mypy --strict...$(C_RESET)"
 	@$(UV) run mypy $(DIR) --strict
-	@echo "$(C_MAGENTA)mypy is good$(C_RESET)"
 	@echo "$(C_GREEN)Lint check successfull$(C_RESET)"

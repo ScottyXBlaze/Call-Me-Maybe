@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/25 22:56:27 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:29:11 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -42,7 +42,7 @@ class Generator:
         Generate an Integer value based on the prompt.
 
         Args:
-            input_ids (list[int]): The token of the prompt. 
+            input_ids (list[int]): The token of the prompt.
         Returns:
             int: The value gaved by the llm.
         """
@@ -88,7 +88,7 @@ class Generator:
         Generate a float value based on the prompt.
 
         Args:
-            input_ids (list[int]): The token of the prompt. 
+            input_ids (list[int]): The token of the prompt.
         Returns:
             float: The value gaved by the llm.
         """
@@ -153,7 +153,7 @@ class Generator:
         Generate a string value based on the prompt.
 
         Args:
-            input_ids (list[int]): The token of the prompt. 
+            input_ids (list[int]): The token of the prompt.
         Returns:
             str: The value gaved by the llm.
         """
