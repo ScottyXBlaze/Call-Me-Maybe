@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/21 16:44:05 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/31 10:19:40 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:43:27 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -23,6 +23,13 @@ class Prompt(BaseModel):
     model_config = ConfigDict(extra="forbid")
     prompt: str = Field()
 
+    @model_validator(mode="after")
+    def check_prompt(self) -> Self:
+        """Check if the prompt is valid or not."""
+        if not self.prompt.strip():
+            raise ValueError("Prompt cannot be empty")
+        return self
+
 
 class ParameterInfo(BaseModel):
     """Class that contains the parameter of the function."""
@@ -31,7 +38,7 @@ class ParameterInfo(BaseModel):
     type: str = Field()
 
     @model_validator(mode="after")
-    def check_func_name(self) -> Self:
+    def check_param_info(self) -> Self:
         """Check if the parameter type is valid or not."""
         if not self.type.strip():
             raise ValueError("Parameter type cannot be empty")
