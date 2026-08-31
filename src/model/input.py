@@ -6,13 +6,15 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/21 16:44:05 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/25 21:28:30 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:19:40 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
 """Module that contains basic class for the inpu part of the program."""
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Self
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Prompt(BaseModel):
@@ -28,6 +30,13 @@ class ParameterInfo(BaseModel):
     model_config = ConfigDict(extra="forbid")
     type: str = Field()
 
+    @model_validator(mode="after")
+    def check_func_name(self) -> Self:
+        """Check if the parameter type is valid or not."""
+        if not self.type.strip():
+            raise ValueError("Parameter type cannot be empty")
+        return self
+
 
 class FunctionDefinition(BaseModel):
     """Class that contains the function."""
@@ -37,3 +46,17 @@ class FunctionDefinition(BaseModel):
     description: str = Field()
     parameters: dict[str, ParameterInfo] = Field()
     returns: dict[str, str] = Field()
+
+    @model_validator(mode="after")
+    def check_func_name(self) -> Self:
+        """Check if the function name is valid or not."""
+        if not self.name.strip():
+            raise ValueError("Function name cannot be empty")
+        return self
+
+    @model_validator(mode="after")
+    def check_func_desc(self) -> Self:
+        """Check if the function description is valid or not."""
+        if not self.description.strip():
+            raise ValueError("Function description cannot be empty")
+        return self

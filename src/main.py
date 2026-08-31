@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/19 09:54:25 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:20:10 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -88,7 +88,7 @@ class Main:
             sys.exit(1)
         except ValidationError as e:
             for error in e.errors():
-                print(f"[ERROR] Invalid format for file: {error}")
+                print(f"[ERROR] Invalid format for file: {error['msg']}")
             sys.exit(1)
         return func_defs, prompts
 
@@ -114,15 +114,11 @@ class Main:
         total = 0.0
         try:
             while True:
-                try:
-                    start = time.perf_counter()
-                    item = next(func_calls)
-                    self._console.print_json(item.model_dump_json(), indent=4)
-                    done = time.perf_counter() - start
-                    total += done
-                except StopIteration as e:
-                    result = e.value
-                    break
+                start = time.perf_counter()
+                item = next(func_calls)
+                self._console.print_json(item.model_dump_json(), indent=4)
+                done = time.perf_counter() - start
+                total += done
         except StopIteration as e:
             result = e.value
         self._console.print(
@@ -136,37 +132,33 @@ class Main:
     def _run_nornal(self, func_calls: Any, len_prompts: int) -> None:
         """Run the normal program."""
         total = 0.0
-        try:
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[magenta]Generating..."),
-                BarColumn(),
-                TaskProgressColumn(),
-            ) as progress:
-                task = progress.add_task(
-                    "Generating...",
-                    total=len_prompts,
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[magenta]Generating..."),
+            BarColumn(),
+            TaskProgressColumn(),
+        ) as progress:
+            task = progress.add_task(
+                "Generating...",
+                total=len_prompts,
+            )
+
+            while True:
+                try:
+                    start = time.perf_counter()
+                    item = next(func_calls)
+                    done = time.perf_counter() - start
+                    total += done
+                except StopIteration as e:
+                    result = e.value
+                    break
+
+                progress.console.print(
+                    f"[bold green]DONE! ({done:05.2f}s)\
+[/bold green] {item.prompt}"
                 )
 
-                while True:
-                    try:
-                        start = time.perf_counter()
-                        item = next(func_calls)
-                        done = time.perf_counter() - start
-                        total += done
-                    except StopIteration as e:
-                        result = e.value
-                        break
-
-                    progress.console.print(
-                        f"[bold green]DONE! ({done:05.2f}s)\
-[/bold green] {item.prompt}"
-                    )
-
-                    progress.update(task, advance=1)
-
-        except StopIteration as e:
-            result = e.value
+                progress.update(task, advance=1)
         self._console.print(
             f"\nGeneration done in {total:.2f} second\n", style="bold green"
         )
