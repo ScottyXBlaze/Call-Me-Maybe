@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/15 00:33:18 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/25 11:40:26 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 13:31:45 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -45,7 +45,7 @@ class StringStateMachine(StateMachine):
 
         Args:
             state (State): The current state.
-            char (str): The current chara.
+            char (str): The current charactere.
         Returns:
             State: Description of return value.
         """
