@@ -1,12 +1,12 @@
-UV = uv
-DIR = src
+UV			= uv
+DIR			= src
 
 C_RESET		= \033[0m
 C_GREEN		= \033[032m
 C_BLUE		= \033[034m
 C_MAGENTA	= \033[035m
 
-CACHE = $(shell find . -name ".mypy_cache" -o -name "__pycache__")
+CACHE		= $(shell find . -name ".mypy_cache" -o -name "__pycache__")
 
 install:
 	@echo "$(C_BLUE)Installing depedencies...$(C_RESET)"
