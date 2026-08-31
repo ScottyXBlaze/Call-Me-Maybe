@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/03 13:16:51 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/31 10:20:10 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 14:07:18 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -43,7 +43,7 @@ class Main:
         self._saver = Saver()
         self._model_list = [
             "Qwen/Qwen3-0.6B",
-            "HuggingFaceTB/SmolLM2-360M-Instruct",
+            "Qwen/Qwen2.5-0.5B-Instruct"
         ]
 
         self._ui = Home(self._model_list)
