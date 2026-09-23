@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 10:03:23 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:31:52 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:30:47 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -27,7 +27,7 @@ class Checker:
         self._arguments = {
             "--functions_definition": "data/input/functions_definition.json",
             "--input": "data/input/function_calling_tests.json",
-            "--output": "data/output/function_calls.json",
+            "--output": "data/output/function_calling_results.json",
         }
 
     def check_args(self, args: list[str]) -> dict[str, str]:

@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/05 09:53:19 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 09:09:30 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 10:45:08 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -41,4 +41,4 @@ class Saver:
         except OSError as e:
             print(f"[ERROR] {e}")
             print("This should never crash!")
-            sys.exit()
+            sys.exit(1)

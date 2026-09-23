@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/10 15:51:08 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 14:13:27 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/25 11:39:41 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -70,18 +70,9 @@ class CustomLLM:
         Returns:
             dict: A dictionnary that contains the function name with it's key.
         """
-        tmp_prompt = f"""
-Choose the exact function name from the list that best answers the prompt.
+        tmp_prompt = f"""Choose a function name \
+based based on their descriptions that answers the prompt.
 
-### Example
-Functions:
-- calculate_sum: Adds two numbers
-- convert_to_upper: Converts text to uppercase
-
-prompt:'What is 15 plus 10?'
-Function: calculate_sum
-
-### Real Task
 Functions:
 {''.join(self._func_desc)}
 
@@ -108,29 +99,18 @@ Function: """
         signature = self._get_func_signature(func_name)
         if not signature:
             return {"parameters": {}}
-        signature_txt = "\n".join(
-            f"{i}. {name}: {type_}"
-            for i, (name, type_) in enumerate(signature.items(), start=1)
+        signature_txt = ", ".join(
+            f"{name}: {type_}" for (name, type_) in signature.items()
         )
 
-        base_prompt = f"""Extract function arguments from the request.
+        base_prompt = f"""Fill the function arguments that answers the request.
+Change argument values when necessary.
 
-Function: {func_name}
-
-Arguments:
-{signature_txt}
-
-Rules:
-- Copy values directly from the request.
-- Do not calculate or infer values.
-- Do not invent values.
-- If a value is not provided, use null.
-- Return only valid JSON.
-- Use the argument names as JSON keys.
-- finish with '"' for string parameters.
+Function:
+{func_name}({signature_txt})
 
 Request:
-"{prompt.prompt}"
+{prompt.prompt}
 
 JSON:
 """
@@ -232,7 +212,7 @@ JSON:
         """
         tmp_prompt = f"""Choose the best name that match the string.
 
-list of name: {self._valid_type}
+list of name: {", ".join(self._valid_type.keys())}
 String: {p_type}
 Best match: """
         func_tokens = []

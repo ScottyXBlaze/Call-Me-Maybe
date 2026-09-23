@@ -6,7 +6,7 @@
 #    By: nyramana <nyramana@student.42antananariv  +#+  +:+       +#+         #
 #                                                +#+#+#+#+#+   +#+            #
 #    Created: 2026/08/11 15:48:28 by nyramana         #+#    #+#              #
-#    Updated: 2026/08/15 11:35:23 by nyramana        ###   ########.fr        #
+#    Updated: 2026/08/31 10:29:11 by nyramana        ###   ########.fr        #
 #                                                                             #
 # *************************************************************************** #
 
@@ -14,7 +14,7 @@
 
 from typing import Any
 
-from .statemachine import (
+from ..statemachine import (
     IntegerStateMachine,
     NumberStateMachine,
     StringStateMachine,
@@ -38,6 +38,14 @@ class Generator:
         )
 
     def _get_integer_value(self, input_ids: list[int]) -> int:
+        """
+        Generate an Integer value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt.
+        Returns:
+            int: The value gaved by the llm.
+        """
         machine = IntegerStateMachine()
         delimiters = {",", "}", "\n", '"'}
 
@@ -76,6 +84,14 @@ class Generator:
             return 0
 
     def _get_number_value(self, input_ids: list[int]) -> float:
+        """
+        Generate a float value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt.
+        Returns:
+            float: The value gaved by the llm.
+        """
         machine = NumberStateMachine()
         delimiters = {",", "}", "\n", '"'}
 
@@ -133,6 +149,14 @@ class Generator:
         )
 
     def _get_string_value(self, input_ids: list[int]) -> str:
+        """
+        Generate a string value based on the prompt.
+
+        Args:
+            input_ids (list[int]): The token of the prompt.
+        Returns:
+            str: The value gaved by the llm.
+        """
         machine = StringStateMachine()
 
         machine.transition('"')
